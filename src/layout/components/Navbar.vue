@@ -6,27 +6,27 @@
 
     <div class="right-menu">
       <template v-if="device!=='mobile'">
-        <search id="header-search" class="right-menu-item" />
+        <!--<search id="header-search" class="right-menu-item" />-->
 
-        <error-log class="errLog-container right-menu-item hover-effect" />
+        <!--<error-log class="errLog-container right-menu-item hover-effect" />-->
 
-        <el-tooltip content="源码地址" effect="dark" placement="bottom">
-          <go-admin-git id="go-admin-git" class="right-menu-item hover-effect" />
-        </el-tooltip>
+        <!--<el-tooltip content="源码地址" effect="dark" placement="bottom">-->
+        <!--<go-admin-git id="go-admin-git" class="right-menu-item hover-effect" />-->
+        <!--</el-tooltip>-->
 
-        <el-tooltip content="文档地址" effect="dark" placement="bottom">
-          <go-admin-doc id="go-admin-doc" class="right-menu-item hover-effect" />
-        </el-tooltip>
+        <!--<el-tooltip content="文档地址" effect="dark" placement="bottom">-->
+        <!--<go-admin-doc id="go-admin-doc" class="right-menu-item hover-effect" />-->
+        <!--</el-tooltip>-->
 
-        <el-tooltip content="打赏" effect="dark" placement="bottom">
-          <go-admin-donate id="go-admin-donatet" class="right-menu-item hover-effect" />
-        </el-tooltip>
+        <!--<el-tooltip content="打赏" effect="dark" placement="bottom">-->
+        <!--<go-admin-donate id="go-admin-donatet" class="right-menu-item hover-effect" />-->
+        <!--</el-tooltip>-->
 
-        <screenfull id="screenfull" class="right-menu-item hover-effect" />
+        <!--<screenfull id="screenfull" class="right-menu-item hover-effect" />-->
 
-        <el-tooltip content="Global Size" effect="dark" placement="bottom">
-          <size-select id="size-select" class="right-menu-item hover-effect" />
-        </el-tooltip>
+        <!--<el-tooltip content="Global Size" effect="dark" placement="bottom">-->
+        <!--<size-select id="size-select" class="right-menu-item hover-effect" />-->
+        <!--</el-tooltip>-->
 
       </template>
 
@@ -39,15 +39,15 @@
           <router-link to="/profile/index">
             <el-dropdown-item>个人中心</el-dropdown-item>
           </router-link>
-          <a target="_blank" href="https://github.com/wenjianzhang/go-admin">
-            <el-dropdown-item>Github go-admin</el-dropdown-item>
-          </a>
-          <a target="_blank" href="https://github.com/wenjianzhang/go-admin-ui">
-            <el-dropdown-item>Github go-admin-ui</el-dropdown-item>
-          </a>
-          <a target="_blank" href="https://github.com/wenjianzhang/go-admin/wiki">
-            <el-dropdown-item>文档</el-dropdown-item>
-          </a>
+          <!--<a target="_blank" href="https://github.com/wenjianzhang/go-admin">-->
+          <!--<el-dropdown-item>Github go-admin</el-dropdown-item>-->
+          <!--</a>-->
+          <!--<a target="_blank" href="https://github.com/wenjianzhang/go-admin-ui">-->
+          <!--<el-dropdown-item>Github go-admin-ui</el-dropdown-item>-->
+          <!--</a>-->
+          <!--<a target="_blank" href="https://github.com/wenjianzhang/go-admin/wiki">-->
+          <!--<el-dropdown-item>文档</el-dropdown-item>-->
+          <!--</a>-->
           <el-dropdown-item divided>
             <span style="display:block;" @click="logout">退出登录</span>
           </el-dropdown-item>
