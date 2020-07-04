@@ -22,3 +22,19 @@ export function deleteSupplier(id) {
     method: 'delete'
   })
 }
+
+export function updateSupplier(id, data) {
+  return request({
+    url: '/api/supplier/update/' + id,
+    method: 'put',
+    data: data
+  })
+}
+
+export function changeStatus(id, data) {
+  return request({
+    url: '/api/supplier/status/' + id,
+    method: 'put',
+    data: data
+  })
+}

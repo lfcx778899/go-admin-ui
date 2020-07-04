@@ -42,7 +42,8 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-        >新增</el-button>
+        >新增
+        </el-button>
       </el-col>
     </el-row>
 
@@ -62,84 +63,181 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-          >修改</el-button>
+          >修改
+          </el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-          >删除</el-button>
+          >删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
+
+    <el-dialog :title="title" :visible.sync="open" width="500px">
+      <el-form ref="form" :model="form" :rules="rules" label-width="120px">
+        <el-form-item label="供应商名称" prop="supplier_name">
+          <el-input v-model="form.supplier_name" placeholder="请输入供应商名称" />
+        </el-form-item>
+        <el-form-item label="供应商地址" prop="supplier_adress">
+          <el-input v-model="form.supplier_adress" placeholder="请输入供应商地址" />
+        </el-form-item>
+        <el-form-item label="联系人姓名" prop="contact_name">
+          <el-input v-model="form.contact_name" placeholder="请输入联系人姓名" />
+        </el-form-item>
+        <el-form-item label="联系人手机" prop="contact_phone">
+          <el-input v-model="form.contact_phone" placeholder="请输入联系人手机" />
+        </el-form-item>
+        <el-form-item label="联系人QQ" prop="contact_qq">
+          <el-input v-model="form.contact_qq" placeholder="请输入联系人QQ" />
+        </el-form-item>
+        <el-form-item label="联系人邮箱" prop="contact_email">
+          <el-input v-model="form.contact_email" placeholder="请输入联系人邮箱" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-  import {getSupplierPage, create, deleteSupplier} from '@/api/basic/supplier';
+import { getSupplierPage, create, deleteSupplier, updateSupplier, changeStatus } from '@/api/basic/supplier'
+
 export default {
   name: 'Index',
-  data(){
+  data() {
     return {
-      showList:[
+      showList: [
         {
-          "contact_email": "string",
-          "contact_name": "string",
-          "contact_phone": "string",
-          "contact_qq": "string",
-          "create_by": "string",
-          "create_sub_company_id": "string",
-          "id": 0,
-          "remark": "string",
-          "supplier_adress": "string",
-          "supplier_id": "string",
-          "supplier_name": "string",
-          "supplier_status": 0,
-          "update_by": "string"
+          'contact_email': 'string',
+          'contact_name': 'string',
+          'contact_phone': 'string',
+          'contact_qq': 'string',
+          'create_by': 'string',
+          'create_sub_company_id': 'string',
+          'id': 0,
+          'remark': 'string',
+          'supplier_adress': 'string',
+          'supplier_id': 'string',
+          'supplier_name': 'string',
+          'supplier_status': 0,
+          'update_by': 'string'
         }
       ],
-      queryParams:{
-        supplier_name:'',
-        contact_name:'',
-        contact_phone:'',
-        page_index:1,
-        page_size:20
+      queryParams: {
+        supplier_name: '',
+        contact_name: '',
+        contact_phone: '',
+        page_index: 1,
+        page_size: 20
       },
-      loading:false,
+      loading: false,
+      form: {},
+      rules: {
+        supplierName: [{ required: true, message: '供应商名称不能为空', trigger: 'blur' }],
+        supplierAdress: [{ required: true, message: '供应商地址不能为空', trigger: 'blur' }],
+        contactName: [{ required: true, message: '联系人姓名不能为空', trigger: 'blur' }],
+        contactPhone: [{ required: true, message: '联系人手机不能为空', trigger: 'blur' }],
+        contactQq: [{ required: true, message: '联系人QQ不能为空', trigger: 'blur' }],
+        contactEmail: [{ required: true, message: '联系人邮箱不能为空', trigger: 'blur' }]
+
+      },
+      title: '',
+      open: false,
+      isEdit: false
     }
   },
-  methods:{
-    handleQuery(){
-      this.queryParams = {page_index:1,page_size:20};
-      this.getListData();
+  mounted() {
+    this.getListData()
+  },
+  methods: {
+    handleQuery() {
+      this.queryParams = { page_index: 1, page_size: 20 }
+      this.getListData()
     },
-    resetQuery(){
-      this.resetForm('queryForm');
+    resetQuery() {
+      this.resetForm('queryForm')
       this.handleQuery()
     },
-    getListData(){
-      getSupplierPage(this.queryParams).then(res=>{
-        console.log(res);
+    getListData() {
+      getSupplierPage(this.queryParams).then(res => {
+        console.log(res)
       })
     },
-    handleDelete(row){
-      const supplierId = row.id;
-      this.$confirm('是否确认删除供应商"' + row.supplier_name+ '"?', '警告', {
+    handleDelete(row) {
+      const supplierId = row.id
+      this.$confirm('是否确认删除供应商"' + row.supplier_name + '"?', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(()=>{
-        deleteSupplier(supplierId).then(res=>{
-          console.log(res);
-          this.handleQuery();
-          this.msgSuccess('删除成功');
-        });
+      }).then(() => {
+        deleteSupplier(supplierId).then(res => {
+          console.log(res)
+          this.handleQuery()
+          this.msgSuccess('删除成功')
+        })
       })
     },
-
-  },
-  mounted() {
-    this.getListData();
+    cancel() {
+      this.open = false
+      this.reset()
+    },
+    reset() {
+      this.form = {
+        id: undefined,
+        supplierId: undefined,
+        supplierName: undefined,
+        supplierAdress: undefined,
+        contactName: undefined,
+        contactPhone: undefined,
+        contactQq: undefined,
+        contactEmail: undefined,
+        supplierStatus: undefined,
+        remark: undefined
+      }
+      this.resetForm('form')
+    },
+    handleAdd() {
+      this.reset()
+      this.open = true
+    },
+    handleUpdate(row) {
+      this.form = row
+      this.open = true
+    },
+    submitForm() {
+      this.$refs['form'].validate(valid => {
+        if (valid) {
+          if (this.form.id !== undefined) {
+            updateSupplierInformation(this.form).then(response => {
+              if (response.code === 200) {
+                this.msgSuccess('修改成功')
+                this.open = false
+                this.handleQuery()
+              } else {
+                this.msgError(response.msg)
+              }
+            })
+          } else {
+            create(this.form).then(response => {
+              console.log(response)
+              if (response.code === 200) {
+                this.msgSuccess('新增成功')
+                this.open = false
+                this.handleQuery()
+              } else {
+                this.msgError(response.msg)
+              }
+            })
+          }
+        }
+      })
+    }
   }
 }
 </script>
