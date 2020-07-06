@@ -68,6 +68,12 @@
           <el-button
             size="mini"
             type="text"
+            icon="el-icon-edit"
+            @click="handleDetail(scope.row)"
+          >详情</el-button>
+          <el-button
+            size="mini"
+            type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
           >删除</el-button>
@@ -87,7 +93,18 @@
     <el-dialog :title="title" :visible.sync="open" width="500px">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="产品类别" prop="product_type">
-          <el-input v-model="form.product_type" placeholder="产品类别" />
+          <el-select
+            v-model="form.product_type"
+            placeholder="产品类别"
+            clearable
+          >
+            <el-option
+              v-for="dict in productTypeList"
+              :key="dict.dictValue"
+              :label="dict.dictLabel"
+              :value="dict.dictValue"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="产品名称" prop="product_name">
           <el-input v-model="form.product_name" placeholder="产品名称" />
