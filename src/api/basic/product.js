@@ -33,7 +33,7 @@ export function getProduct(query) {
 
 export function updateProduct(id, data) {
   return request({
-    url: '/api/product/update/' + id,
+    url: '/api/product/update/'+ id,
     method: 'put',
     data: data
   })

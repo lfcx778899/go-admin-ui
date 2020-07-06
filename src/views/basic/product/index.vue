@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
+    <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="80px">
 
       <el-form-item label="产品类别">
         <el-select
@@ -57,7 +57,7 @@
       <el-table-column label="单位" prop="product_units" width="120" />
       <el-table-column label="备注" prop="remark" width="120" />
 
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="210">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -243,20 +243,20 @@ export default {
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset()
-      const id = row.id || this.ids
-      getProductInformation(id).then(response => {
-        this.form = response.data
-        this.open = true
-        this.title = '编辑商品'
-        this.isEdit = true
-      })
+      this.form = row;
+      this.title = '编辑商品'
+      this.open = true
+      this.isEdit = true
+    },
+    handleDetail(row){
+      this.$router.push({path:'/basic/productdetail',query:{productId:row.id}})
     },
     /** 提交按钮 */
     submitForm: function() {
       this.$refs['form'].validate(valid => {
         if (valid) {
           if (this.form.id !== undefined) {
-            updateProduct(this.form).then(response => {
+            updateProduct(this.form.id,this.form).then(response => {
               console.log(response);
               if (response.code === 200) {
                 this.msgSuccess('修改成功')
@@ -283,17 +283,21 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const Ids = row.id || this.ids
-      this.$confirm('是否确认删除编号为"' + Ids + '"的数据项?', '警告', {
+      this.$confirm('是否确认删除商品"' + row.product_name + '"?', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(function() {
-        return delProductInformation(Ids)
-      }).then(() => {
-        this.getList()
-        this.msgSuccess('删除成功')
-      }).catch(function() {})
+      }).then(()=> {
+        deleteProduct(row.id).then(resp=>{
+          if (resp.code === 200) {
+            this.msgSuccess('删除成功')
+            this.getList()
+          } else {
+            this.msgError(resp.msg)
+          }
+        })
+
+      })
     }
   }
 }
