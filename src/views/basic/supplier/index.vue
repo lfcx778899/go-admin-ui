@@ -99,8 +99,8 @@
     <pagination
       v-show="total>0"
       :total="total"
-      :page.sync="queryParams.page_index"
-      :limit.sync="queryParams.page_size"
+      :page.sync="queryParams.pageIndex"
+      :limit.sync="queryParams.pageSize"
       @pagination="getListData"
     />
 
@@ -145,8 +145,8 @@ export default {
         supplier_name: '',
         contact_name: '',
         contact_phone: '',
-        page_index: 1,
-        page_size: 10
+        pageIndex: 1,
+        pageSize: 10
       },
       loading: false,
       form: {},

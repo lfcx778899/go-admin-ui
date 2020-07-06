@@ -36,7 +36,6 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button
-          v-permisaction="['productinformation:productinformation:add']"
           type="primary"
           icon="el-icon-plus"
           size="mini"
@@ -45,19 +44,28 @@
       </el-col>
     </el-row>
 
-    <el-table v-loading="loading" :data="productinformationList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="productList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
+      <el-table-column label="产品ID" prop="product_id" width="300" />
+      <el-table-column label="产品类别" prop="product_type" width="150" />
+      <el-table-column label="产品名称" prop="product_name" width="250" />
+      <el-table-column label="英文名称" prop="product_english_name" width="100" />
+      <el-table-column label="CASNO号" prop="product_casno" width="120" />
+      <el-table-column label="货号" prop="product_item_number" width="120" />
+      <el-table-column label="品牌" prop="product_brand_name" width="120" />
+      <el-table-column label="规格" prop="product_specifications" width="120" />
+      <el-table-column label="单位" prop="product_units" width="120" />
+      <el-table-column label="备注" prop="remark" width="120" />
+
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
-            v-permisaction="['productinformation:productinformation:edit']"
             size="mini"
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
           >修改</el-button>
           <el-button
-            v-permisaction="['productinformation:productinformation:remove']"
             size="mini"
             type="text"
             icon="el-icon-delete"
@@ -77,36 +85,36 @@
 
     <!-- 添加或修改对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px">
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="产品类别" prop="productType">
-          <el-input v-model="form.productType" placeholder="产品类别" />
+      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
+        <el-form-item label="产品类别" prop="product_type">
+          <el-input v-model="form.product_type" placeholder="产品类别" />
         </el-form-item>
-        <el-form-item label="产品名称" prop="productName">
-          <el-input v-model="form.productName" placeholder="产品名称" />
+        <el-form-item label="产品名称" prop="product_name">
+          <el-input v-model="form.product_name" placeholder="产品名称" />
         </el-form-item>
-        <el-form-item label="产品英文名称" prop="productEnglishName">
-          <el-input v-model="form.productEnglishName" placeholder="产品英文名称" />
+        <el-form-item label="产品英文名称" prop="product_english_name">
+          <el-input v-model="form.product_english_name" placeholder="产品英文名称" />
         </el-form-item>
-        <el-form-item label="CASNO号" prop="productCasno">
-          <el-input v-model="form.productCasno" placeholder="CASNO号" />
+        <el-form-item label="CASNO号" prop="product_casno">
+          <el-input v-model="form.product_casno" placeholder="CASNO号" />
         </el-form-item>
-        <el-form-item label="货号" prop="productItemNumber">
-          <el-input v-model="form.productItemNumber" placeholder="货号" />
+        <el-form-item label="货号" prop="product_item_number">
+          <el-input v-model="form.product_item_number" placeholder="货号" />
         </el-form-item>
-        <el-form-item label="品牌" prop="productBrandName">
-          <el-input v-model="form.productBrandName" placeholder="品牌" />
+        <el-form-item label="品牌" prop="product_brand_name">
+          <el-input v-model="form.product_brand_name" placeholder="品牌" />
         </el-form-item>
-        <el-form-item label="产品规格" prop="productSpecifications">
-          <el-input v-model="form.productSpecifications" placeholder="产品规格" />
+        <el-form-item label="产品规格" prop="product_specifications">
+          <el-input v-model="form.product_specifications" placeholder="产品规格" />
         </el-form-item>
-        <el-form-item label="产品单位" prop="productUnits">
-          <el-input v-model="form.productUnits" placeholder="产品单位" />
+        <el-form-item label="产品单位" prop="product_units">
+          <el-input v-model="form.product_units" placeholder="产品单位" />
         </el-form-item>
-        <el-form-item label="条形码" prop="productBarcode">
-          <el-input v-model="form.productBarcode" placeholder="条形码" />
+        <el-form-item label="条形码" prop="product_barcode">
+          <el-input v-model="form.product_barcode" placeholder="条形码" />
         </el-form-item>
-        <el-form-item label="包装规格" prop="packageSize">
-          <el-input v-model="form.packageSize" placeholder="包装规格" />
+        <el-form-item label="包装规格" prop="package_size">
+          <el-input v-model="form.package_size" placeholder="包装规格" />
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" placeholder="备注" />
@@ -121,7 +129,7 @@
 </template>
 
 <script>
-import { getProductPage, create, deleteSupplier, updateSupplier, changeStatus } from '@/api/basic/product'
+import { getProductPage, create, deleteProduct, updateProduct, getProduct } from '@/api/basic/product'
 import { getDicts } from '@/api/system/dict/data'
 export default {
   name: 'Index',
@@ -141,7 +149,9 @@ export default {
       },
       productTypeList: [],
       form: {},
-      rules: {}
+      rules: {},
+      productList:[],
+      total:0,
     }
   },
   created() {
@@ -156,7 +166,8 @@ export default {
     getList() {
       this.loading = true
       getProductPage(this.queryParams).then(resp => {
-        console.log(resp)
+        this.productList = resp.data.items;
+        this.total = resp.data.total;
         this.loading = false
       })
     },
@@ -173,17 +184,17 @@ export default {
     reset() {
       this.form = {
         id: undefined,
-        productId: undefined,
-        productType: undefined,
-        productName: undefined,
-        productEnglishName: undefined,
-        productCasno: undefined,
-        productItemNumber: undefined,
-        productBrandName: undefined,
-        productSpecifications: undefined,
-        productUnits: undefined,
-        productBarcode: undefined,
-        packageSize: undefined,
+        product_id: undefined,
+        product_type: undefined,
+        product_name: undefined,
+        product_english_name: undefined,
+        product_casno: undefined,
+        product_item_number: undefined,
+        product_brand_name: undefined,
+        product_specifications: undefined,
+        product_units: undefined,
+        product_barcode: undefined,
+        package_size: undefined,
         remark: undefined
       }
       this.resetForm('form')
@@ -228,7 +239,8 @@ export default {
       this.$refs['form'].validate(valid => {
         if (valid) {
           if (this.form.id !== undefined) {
-            updateProductInformation(this.form).then(response => {
+            updateProduct(this.form).then(response => {
+              console.log(response);
               if (response.code === 200) {
                 this.msgSuccess('修改成功')
                 this.open = false
@@ -238,7 +250,8 @@ export default {
               }
             })
           } else {
-            addProductInformation(this.form).then(response => {
+            create(this.form).then(response => {
+              console.log(response);
               if (response.code === 200) {
                 this.msgSuccess('新增成功')
                 this.open = false
