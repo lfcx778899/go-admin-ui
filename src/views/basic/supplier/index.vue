@@ -51,23 +51,43 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="供应商编码" prop="supplier_id" width="120" />
       <el-table-column label="供应商名称" prop="supplier_name" width="150" />
-      <el-table-column label="供应商地址" prop="supplier_adress" width="150" />
+      <el-table-column label="供应商地址" prop="supplier_adress" width="250" />
       <el-table-column label="联系人" prop="contact_name" width="100" />
       <el-table-column label="联系电话" prop="contact_phone" width="120" />
       <el-table-column label="联系QQ" prop="contact_qq" width="120" />
-      <el-table-column label="状态" prop="supplier_status" width="120" />
+      <el-table-column label="状态" prop="supplier_status" width="120" >
+        <template slot-scope="scope">
+          <span>{{scope.row.supplier_status===0? "启用":"停用"}}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
-            size="mini"
-            type="text"
+            size="small"
+            type="primary"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
           >修改
           </el-button>
+          <el-button v-if="scope.row.supplier_status===0"
+            size="small"
+            type="info"
+            :icon="statusIcon(scope.row)"
+            @click="handleStatusChange(scope.row)"
+          >
+            <span>停用</span>
+          </el-button>
+          <el-button v-if="scope.row.supplier_status===1"
+            size="small"
+            type="success"
+            :icon="statusIcon(scope.row)"
+            @click="handleStatusChange(scope.row)"
+          >
+            <span>启用</span>
+          </el-button>
           <el-button
-            size="mini"
-            type="text"
+            size="small"
+            type="warning"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
           >删除
@@ -75,6 +95,14 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <pagination
+      v-show="total>0"
+      :total="total"
+      :page.sync="queryParams.page_index"
+      :limit.sync="queryParams.page_size"
+      @pagination="getListData"
+    />
 
     <el-dialog :title="title" :visible.sync="open" width="500px">
       <el-form ref="form" :model="form" :rules="rules" label-width="120px">
@@ -112,29 +140,13 @@ export default {
   name: 'Index',
   data() {
     return {
-      showList: [
-        {
-          'contact_email': 'string',
-          'contact_name': 'string',
-          'contact_phone': 'string',
-          'contact_qq': 'string',
-          'create_by': 'string',
-          'create_sub_company_id': 'string',
-          'id': 0,
-          'remark': 'string',
-          'supplier_adress': 'string',
-          'supplier_id': 'string',
-          'supplier_name': 'string',
-          'supplier_status': 0,
-          'update_by': 'string'
-        }
-      ],
+      showList: [],
       queryParams: {
         supplier_name: '',
         contact_name: '',
         contact_phone: '',
         page_index: 1,
-        page_size: 20
+        page_size: 10
       },
       loading: false,
       form: {},
@@ -145,11 +157,12 @@ export default {
         contactPhone: [{ required: true, message: '联系人手机不能为空', trigger: 'blur' }],
         contactQq: [{ required: true, message: '联系人QQ不能为空', trigger: 'blur' }],
         contactEmail: [{ required: true, message: '联系人邮箱不能为空', trigger: 'blur' }]
-
       },
       title: '',
       open: false,
-      isEdit: false
+      isEdit: false,
+      total:0,
+
     }
   },
   mounted() {
@@ -157,8 +170,10 @@ export default {
   },
   methods: {
     handleQuery() {
-      this.queryParams = { page_index: 1, page_size: 20 }
       this.getListData()
+    },
+    statusIcon(row){
+      return row.supplier_status===0? 'el-icon-check':'el-icon-close';
     },
     resetQuery() {
       this.resetForm('queryForm')
@@ -166,7 +181,24 @@ export default {
     },
     getListData() {
       getSupplierPage(this.queryParams).then(res => {
-        console.log(res)
+        this.showList = res.data.items;
+        this.total = res.data.total;
+      })
+    },
+    handleStatusChange(row){
+      const supplierId = row.id
+      const supplierStatus = row.supplier_status;
+      let queryMessage = supplierStatus===0? "是否确认停用供应商？":"是否确认启用供应商？";
+      let updateData = {supplier_status:supplierStatus===0 ? 1 : 0 }
+      this.$confirm(queryMessage, '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        changeStatus(supplierId,updateData).then(res => {
+          this.handleQuery()
+          this.msgSuccess('操作成功')
+        })
       })
     },
     handleDelete(row) {
@@ -214,7 +246,7 @@ export default {
       this.$refs['form'].validate(valid => {
         if (valid) {
           if (this.form.id !== undefined) {
-            updateSupplierInformation(this.form).then(response => {
+            updateSupplier(this.form.id,this.form).then(response => {
               if (response.code === 200) {
                 this.msgSuccess('修改成功')
                 this.open = false
