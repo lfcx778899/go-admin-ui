@@ -38,3 +38,10 @@ export function changeStatus(id, data) {
     data: data
   })
 }
+
+export function getInUseSupplier(){
+  return request({
+    url: '/api/supplier/get_all_by_status',
+    method: 'get',
+  })
+}

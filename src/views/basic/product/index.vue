@@ -14,14 +14,14 @@
             v-for="dict in productTypeList"
             :key="dict.dictValue"
             :label="dict.dictLabel"
-            :value="dict.dictValue"
+            :value="dict.dictLabel"
           />
         </el-select>
       </el-form-item>
       <el-form-item label="产品名称">
         <el-input
           v-model="queryParams.product_name"
-          placeholder="请输入供应商名称"
+          placeholder="请输入产品名称"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -57,23 +57,23 @@
       <el-table-column label="单位" prop="product_units" width="120" />
       <el-table-column label="备注" prop="remark" width="120" />
 
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="210">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="280">
         <template slot-scope="scope">
           <el-button
-            size="mini"
-            type="text"
+            size="small"
+            type="primary"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
           >修改</el-button>
           <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
+            size="small"
+            type="success"
+            icon="el-icon-view"
             @click="handleDetail(scope.row)"
           >详情</el-button>
           <el-button
-            size="mini"
-            type="text"
+            size="small"
+            type="warning"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
           >删除</el-button>
@@ -97,17 +97,18 @@
             v-model="form.product_type"
             placeholder="产品类别"
             clearable
+            style="width: 360px"
           >
             <el-option
               v-for="dict in productTypeList"
               :key="dict.dictValue"
               :label="dict.dictLabel"
-              :value="dict.dictValue"
+              :value="dict.dictLabel"
             />
           </el-select>
         </el-form-item>
         <el-form-item label="产品名称" prop="product_name">
-          <el-input v-model="form.product_name" placeholder="产品名称" />
+          <el-input v-model="form.product_name" placeholder="产品名称" style="width: 360px"/>
         </el-form-item>
         <el-form-item label="产品英文名称" prop="product_english_name">
           <el-input v-model="form.product_english_name" placeholder="产品英文名称" />
@@ -142,6 +143,7 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
   </div>
 </template>
 
@@ -166,7 +168,10 @@ export default {
       },
       productTypeList: [],
       form: {},
-      rules: {},
+      rules: {
+        product_type:[{ required: true, message: '商品类型不能为空', trigger: 'blur' }],
+        product_name:[{ required: true, message: '商品名称不能为空', trigger: 'blur' }],
+      },
       productList:[],
       total:0,
     }
@@ -249,7 +254,8 @@ export default {
       this.isEdit = true
     },
     handleDetail(row){
-      this.$router.push({path:'/basic/productdetail',query:{productId:row.id}})
+      sessionStorage.setItem("productId",row.id);
+      this.$router.push({path:'/basic/productdetail'})
     },
     /** 提交按钮 */
     submitForm: function() {

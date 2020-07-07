@@ -151,12 +151,12 @@ export default {
       loading: false,
       form: {},
       rules: {
-        supplierName: [{ required: true, message: '供应商名称不能为空', trigger: 'blur' }],
-        supplierAdress: [{ required: true, message: '供应商地址不能为空', trigger: 'blur' }],
-        contactName: [{ required: true, message: '联系人姓名不能为空', trigger: 'blur' }],
-        contactPhone: [{ required: true, message: '联系人手机不能为空', trigger: 'blur' }],
-        contactQq: [{ required: true, message: '联系人QQ不能为空', trigger: 'blur' }],
-        contactEmail: [{ required: true, message: '联系人邮箱不能为空', trigger: 'blur' }]
+        supplier_name: [{ required: true, message: '供应商名称不能为空', trigger: 'blur' }],
+        supplier_adress: [{ required: true, message: '供应商地址不能为空', trigger: 'blur' }],
+        contact_name: [{ required: true, message: '联系人姓名不能为空', trigger: 'blur' }],
+        contact_phone: [{ required: true, message: '联系人手机不能为空', trigger: 'blur' }],
+        contact_qq: [{ required: true, message: '联系人QQ不能为空', trigger: 'blur' }],
+        contact_email: [{ required: true, message: '联系人邮箱不能为空', trigger: 'blur' }]
       },
       title: '',
       open: false,
