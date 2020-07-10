@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="68px">
+    <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="100px">
       <el-form-item label="状态">
         <el-select
           v-model="queryParams.requests_status"
@@ -80,13 +80,13 @@
     <el-table v-loading="loading" :data="purchaserequestsList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
 
-      <el-table-column label="申请时间" prop="created_at" width="300" >
+      <el-table-column label="申请时间" prop="created_at" width="200" >
         <template slot-scope="scope">
           <span>{{parseTime(scope.row.created_at)}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="申请人" prop="create_by_name" width="150" />
-      <el-table-column label="状态" prop="requests_status" width="250" >
+      <el-table-column label="申请人" prop="create_by_name" width="120" />
+      <el-table-column label="状态" prop="requests_status" width="120" >
         <template slot-scope="scope">
           <span>{{scope.row.statusName}}</span>
         </template>
@@ -94,8 +94,8 @@
       <el-table-column label="产品类别" prop="product_type" width="100" />
       <el-table-column label="产品名称" prop="product_name" width="120" />
       <el-table-column label="申请数量" prop="requests_quantity" width="120" />
-      <el-table-column label="备注" prop="remark" width="120" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <!--<el-table-column label="备注" prop="remark" width="360" />-->
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="360">
         <template slot-scope="scope">
           <el-button
             size="small"
