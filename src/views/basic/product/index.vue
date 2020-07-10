@@ -263,7 +263,6 @@ export default {
         if (valid) {
           if (this.form.id !== undefined) {
             updateProduct(this.form.id,this.form).then(response => {
-              console.log(response);
               if (response.code === 200) {
                 this.msgSuccess('修改成功')
                 this.open = false
@@ -274,7 +273,6 @@ export default {
             })
           } else {
             create(this.form).then(response => {
-              console.log(response);
               if (response.code === 200) {
                 this.msgSuccess('新增成功')
                 this.open = false

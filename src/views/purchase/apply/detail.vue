@@ -1,0 +1,143 @@
+<template>
+  <div class="app-container">
+    <div class="detail-title">
+      <h3>基本信息</h3>
+    </div>
+    <el-form :inline="true" label-width="100px" label-position="right">
+      <el-row>
+        <el-col :span="6">
+          <el-form-item label="申请单号">
+            <span>{{purchaseOrder.purchase_request_id}}</span>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label="申请时间" :span="6">
+            <span>{{parseTime(purchaseOrder.created_at)}}</span>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label="状态" :span="6">
+            <span>{{purchaseOrder.statusName}}</span>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label="申请部门" :span="6">
+            <span>{{purchaseOrder.dept_name}}</span>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="6">
+          <el-form-item label="申请人">
+            <span>{{purchaseOrder.create_by_name}}</span>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label="产品编号" :span="6">
+            <span>{{purchaseOrder.product_id}}</span>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label="产品名称" :span="6">
+            <span>{{purchaseOrder.product_name}}</span>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label="产品类别" :span="6">
+            <span>{{purchaseOrder.product_type}}</span>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="6">
+          <el-form-item label="申请数量">
+            <span>{{purchaseOrder.requests_quantity}}</span>
+          </el-form-item>
+        </el-col>
+      </el-row>
+    </el-form>
+    <div class="detail-title">
+      <h3>操作日志</h3>
+    </div>
+    <el-table v-loading="loading" :data="logList">
+      <el-table-column label="操作时间" prop="created_at" width="300" />
+      <el-table-column label="操作人" prop="create_by" width="150" />
+      <el-table-column label="操作步骤" prop="remark" width="250" />
+      <el-table-column label="处理状态" prop="statusName" width="100" />
+    </el-table>
+    <pagination
+      v-show="total>0"
+      :total="total"
+      :page.sync="queryParams.pageIndex"
+      :limit.sync="queryParams.pageSize"
+      @pagination="getLogPage"
+    />
+  </div>
+
+
+</template>
+
+<script>
+  import {getItem} from '@/api/purchase/apply'
+  import { getDicts } from '@/api/system/dict/data'
+  import {getPage} from '@/api/purchase/log'
+  export default {
+    name: 'detail',
+    data(){
+      return {
+        purchaseOrder:{},
+        queryParams:{
+          purchase_request_id :'',
+          pageIndex: 1,
+          pageSize: 10
+        },
+        total:0,
+        logList:[],
+      }
+    },
+    mounted(){
+      let purchaseRequestId = sessionStorage.getItem('purchaseRequestId');
+      this.purchaseRequestId = purchaseRequestId;
+      getDicts('purchase_status').then(response => {
+        this.orderStatusList = response.data
+      })
+      getItem({id:purchaseRequestId}).then(response=>{
+        if(response && response.data){
+          let statusName = '';
+          this.orderStatusList.forEach(si=>{
+            if(si.dictValue===String(response.data.requests_status)){
+              statusName = si.dictLabel;
+            }
+          })
+          this.queryParams.purchase_request_id = response.data.purchase_request_id;
+          this.purchaseOrder = {...response.data,statusName:statusName}
+          this.getLogPage();
+        }
+      });
+    },
+    methods:{
+      getLogPage(){
+        getPage(this.queryParams).then(response=>{
+          if(response.code===200){
+            let tempList = [];
+            if(response.data&& response.data.items && response.data.items.length>0){
+              response.data.items.forEach(logItem=>{
+                this.orderStatusList.forEach(si=>{
+                  if(si.dictValue===String(logItem.operate_status)){
+                    tempList.push({...logItem,statusName:si.dictLabel});
+                  }
+                })
+              })
+            }
+            this.logList = tempList;
+            this.total = response.data.total;
+          }
+        })
+      }
+    }
+  }
+</script>
+
+<style scoped>
+
+</style>

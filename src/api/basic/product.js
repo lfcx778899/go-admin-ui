@@ -39,3 +39,10 @@ export function updateProduct(id, data) {
   })
 }
 
+//获取产品列表
+export function getAll() {
+  return request({
+    url: '/api/product/get_all',
+    method: 'get',
+  })
+}
