@@ -176,6 +176,7 @@ export default {
       return row.supplier_status===0? 'el-icon-check':'el-icon-close';
     },
     resetQuery() {
+      this.queryParams ={ pageIndex: 1, pageSize: 10 }
       this.resetForm('queryForm')
       this.handleQuery()
     },

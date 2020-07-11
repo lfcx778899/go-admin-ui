@@ -218,7 +218,11 @@ export default {
       this.getList()
     },
     resetQuery() {
-      this.dateRange = []
+      this.queryParams = {
+        requests_statuss: '2,3,4',
+        pageIndex: 1,
+        pageSize: 10
+      }
       this.resetForm('queryForm')
       this.handleQuery()
     },

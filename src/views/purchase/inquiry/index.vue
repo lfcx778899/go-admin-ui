@@ -108,7 +108,18 @@ export default {
     getList(){
 
     },
-
+    resetQuery() {
+      this.queryParams = {
+        pageIndex: 1,
+        pageSize: 10
+      }
+      this.resetForm('queryForm')
+      this.handleQuery()
+    },
+    handleQuery(){
+      this.queryParams.pageIndex = 1
+      this.getList()
+    },
   }
 }
 </script>

@@ -248,10 +248,10 @@ export default {
     },
     resetQuery() {
       this.queryParams = {
-        requests_statuss:"3,4,5,6",
-          pageIndex: 1,
-          pageSize: 10,
-      };
+        requests_statuss: '3,4,5,6',
+        pageIndex: 1,
+        pageSize: 10
+      }
       this.resetForm('queryForm')
       this.handleQuery()
     },
