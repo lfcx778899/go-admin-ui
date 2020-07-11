@@ -53,3 +53,11 @@ export function updateStatus(id, data) {
   })
 }
 
+//分页获取主管审批列表,待采购物资列表
+export function getApprovals(query) {
+  return request({
+    url: '/api/purchase_request/get_all_by_approvals',
+    method: 'get',
+    params: query
+  })
+}

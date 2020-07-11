@@ -34,6 +34,7 @@
             :value="dict.dictLabel"
           />
         </el-select>
+      </el-form-item>
         <el-form-item label="产品名称">
           <el-select
             v-model="queryParams.product_name"
@@ -50,7 +51,6 @@
             />
           </el-select>
         </el-form-item>
-      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -294,7 +294,6 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRange = []
       this.resetForm('queryForm')
       this.handleQuery()
     },
@@ -368,7 +367,7 @@ export default {
     },
     handleDetail(row){
       sessionStorage.setItem("purchaseRequestId",row.id);
-      this.$router.push({path:'/purchase/detail'})
+      this.$router.push({path:'/purchase/apply/detail'})
     },
     /** 提交按钮 */
     submitForm: function() {

@@ -3,7 +3,7 @@
     <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="100px">
       <el-form-item label="归属部门" prop="deptId">
         <treeselect
-          v-model="queryParams.dept_name"
+          v-model="queryParams.dept_id"
           :options="deptOptions"
           :normalizer="normalizer"
           placeholder="请选择归属部门"
@@ -17,7 +17,6 @@
           clearable
           size="small"
           style="width: 240px"
-          @change="changeProductName"
         >
           <el-option
             v-for="dict in productTypeList"
@@ -26,22 +25,6 @@
             :value="dict.dictLabel"
           />
         </el-select>
-        <el-form-item label="产品名称">
-          <el-select
-            v-model="queryParams.product_name"
-            placeholder="产品名称"
-            clearable
-            size="small"
-            style="width: 240px"
-          >
-            <el-option
-              v-for="product in selectProductList"
-              :key="product.id"
-              :label="product.product_name"
-              :value="product.product_name"
-            />
-          </el-select>
-        </el-form-item>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -53,18 +36,19 @@
       <el-col :span="1.5">
         <el-button
           type="primary"
-          icon="el-icon-plus"
+          icon="el-icon-check"
           size="mini"
-          @click="handleAdd"
+          :disabled="single"
+          @click="handleAudit"
         >审批通过</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
           type="success"
-          icon="el-icon-edit"
+          icon="el-icon-close"
           size="mini"
           :disabled="single"
-          @click="handleApplyOrder"
+          @click="handleReject"
         >取消采购</el-button>
       </el-col>
     </el-row>
@@ -77,7 +61,7 @@
           <span>{{parseTime(scope.row.created_at)}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="申请组" prop="create_by_name" width="120" />
+      <el-table-column label="部门名称" prop="dept_name" width="120" />
       <el-table-column label="申请人" prop="create_by_name" width="120" />
       <el-table-column label="状态" prop="requests_status" width="120" >
         <template slot-scope="scope">
@@ -87,13 +71,13 @@
       <el-table-column label="产品类别" prop="product_type" width="100" />
       <el-table-column label="产品名称" prop="product_name" width="120" />
       <el-table-column label="申请数量" prop="requests_quantity" width="120" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="360">
+      <el-table-column label="操作" align="left" class-name="small-padding fixed-width" width="360">
         <template slot-scope="scope">
-          <el-button
+          <el-button v-if="scope.row.requests_status===2"
             size="small"
             type="primary"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
+            icon="el-icon-check"
+            @click="handleSingleAudit(scope.row)"
           >审批通过</el-button>
           <el-button
             size="small"
@@ -101,11 +85,11 @@
             icon="el-icon-view"
             @click="handleDetail(scope.row)"
           >详情</el-button>
-          <el-button
+          <el-button v-if="scope.row.requests_status===2"
             size="small"
             type="warning"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
+            icon="el-icon-close"
+            @click="handleSingleReject(scope.row)"
           >取消采购</el-button>
         </template>
       </el-table-column>
@@ -128,7 +112,7 @@
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   import {getDicts} from "@/api/system/dict/data";
   import {getAll} from "@/api/basic/product";
-  import {getpage,create,deleteItem,updateItem,updateStatus} from '@/api/purchase/apply';
+  import {getApprovals,create,deleteItem,updateItem,updateStatus} from '@/api/purchase/apply';
 export default {
   name: 'Index',
   components: { Treeselect },
@@ -157,6 +141,7 @@ export default {
       productTypeList:[],
       // 查询参数
       queryParams: {
+        requests_statuss:"2,3,4",
         pageIndex: 1,
         pageSize: 10,
       },
@@ -175,13 +160,29 @@ export default {
     getAll().then(response=>{
       this.productList = response.data.items;
       this.selectProductList = this.productList;
+    });
+    getDicts('purchase_status').then(response => {
+      this.orderStatusList = response.data
     })
+    this.getList();
   },
   methods:{
     getTreeselect() {
       treeselect().then(response => {
         this.deptOptions = response.data
       })
+    },
+    changeProductName(){
+      this.selectProductList = this.productList.filter(item=>{
+        return item.product_type ===this.queryParams.product_type;
+      })
+      this.queryParams.product_name = undefined;
+    },
+    handleSelectionChange(selection) {
+      this.selectRows = selection;
+      this.ids = selection.map(item => item.id)
+      this.single = selection.length !== 1
+      this.multiple = !selection.length
     },
     normalizer(node) {
       if (node.children && !node.children.length) {
@@ -192,6 +193,129 @@ export default {
         label: node.deptName,
         children: node.children
       }
+    },
+    getList(){
+      this.loading = true
+      getApprovals(this.queryParams).then(response => {
+          let tempList =[];
+          if(response.data&&response.data.items&&response.data.items.length>0){
+            response.data.items.forEach(item=>{
+              this.orderStatusList.forEach(si=>{
+                if(si.dictValue===String(item.requests_status)){
+                  tempList.push({...item,statusName:si.dictLabel});
+                }
+              })
+            })
+          }
+          this.purchaserequestsList = tempList;
+          this.total = response.data.total;
+          this.loading = false
+        }
+      )
+    },
+    handleQuery() {
+      this.queryParams.pageIndex = 1
+      this.getList()
+    },
+    resetQuery() {
+      this.dateRange = []
+      this.resetForm('queryForm')
+      this.handleQuery()
+    },
+    handleAudit(){
+      let ids =[];
+      this.selectRows.forEach(item=>{
+        if(item.requests_status === 2){
+          ids.push(item.id)
+        }
+      })
+      if(ids.length>0){
+        this.$confirm('是否确认审批通过' + ids.length + '条采购申请?', '警告', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          let idStr = ids.join(',');
+          updateStatus(idStr, { requests_status: 3 }).then(response => {
+            if (response.code === 200) {
+              this.msgSuccess('操作成功')
+              this.open = false
+              this.getList()
+            } else {
+              this.msgError(response.msg)
+            }
+          })
+        })
+      }else{
+        this.msgInfo('没有选择可以操作的数据')
+      }
+    },
+    handleReject(){
+      let ids =[];
+      this.selectRows.forEach(item=>{
+        if(item.requests_status === 2){
+          ids.push(item.id)
+        }
+      })
+      if(ids.length>0){
+        this.$confirm('是否确认取消' + ids.length + '条采购申请?', '警告', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          let idStr = ids.join(',');
+          updateStatus(idStr, { requests_status: 4 }).then(response => {
+            if (response.code === 200) {
+              this.msgSuccess('操作成功')
+              this.open = false
+              this.getList()
+            } else {
+              this.msgError(response.msg)
+            }
+          })
+        })
+      }else{
+        this.msgInfo('没有选择可以操作的数据')
+      }
+    },
+    handleSingleAudit(row){
+      this.$confirm('是否确认审批通过 ?', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        updateStatus(row.id, { requests_status: 3 }).then(response => {
+          if (response.code === 200) {
+            this.msgSuccess('操作成功')
+            this.open = false
+            this.getList()
+          } else {
+            this.msgError(response.msg)
+          }
+        })
+      })
+
+    },
+    handleSingleReject(row){
+      this.$confirm('是否确认取消采购 ?', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        updateStatus(row.id, { requests_status: 4 }).then(response => {
+          if (response.code === 200) {
+            this.msgSuccess('操作成功')
+            this.open = false
+            this.getList()
+          } else {
+            this.msgError(response.msg)
+          }
+        })
+      })
+    },
+    handleDetail(row){
+      sessionStorage.setItem("purchaseRequestId",row.id);
+      this.$router.push({path:'/purchase/approval/detail'})
     },
   }
 }

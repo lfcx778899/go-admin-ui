@@ -225,9 +225,10 @@
         this.productId = productId;
         getProduct({id:productId}).then(response=>{
             this.product = response.data
+          this.queryParams.product_id = response.data.product_id;
+          this.getSupplierPricePage();
         });
-        this.queryParams.product_id = productId;
-        this.getSupplierPricePage();
+
         getDicts('money_type').then(response => {
           this.moneyTypeList = response.data
         })
@@ -268,8 +269,7 @@
           this.$refs['form'].validate(valid => {
             if (valid) {
               if (this.form.id !== undefined) {
-                updateItem(this.form.id,{...this.form,product_id:String(this.product.id),is_default:Number(this.form.is_default)}).then(response => {
-                  console.log(response);
+                updateItem(this.form.id,{...this.form,product_id:String(this.product.product_id),is_default:Number(this.form.is_default)}).then(response => {
                   if (response.code === 200) {
                     this.msgSuccess('修改成功')
                     this.open = false
@@ -279,8 +279,7 @@
                   }
                 })
               } else {
-                create({...this.form,product_id:String(this.product.id),is_default:Number(this.form.is_default) }).then(response => {
-                  console.log(response);
+                create({...this.form,product_id:String(this.product.product_id),is_default:Number(this.form.is_default) }).then(response => {
                   if (response.code === 200) {
                     this.msgSuccess('新增成功')
                     this.open = false

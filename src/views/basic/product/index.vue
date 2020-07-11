@@ -229,6 +229,7 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
+      this.queryParams ={ pageIndex: 1, pageSize: 20 }
       this.resetForm('queryForm')
       this.handleQuery()
     },

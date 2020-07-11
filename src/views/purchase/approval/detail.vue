@@ -77,13 +77,34 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getLogPage"
     />
+
+    <div>
+      <el-row :gutter="10" class="mb8">
+        <el-col :span="1.5">
+          <el-button v-if="purchaseOrder.requests_status===2"
+            type="primary"
+            icon="el-icon-check"
+            size="mini"
+            @click="handleSingleAudit"
+          >审批通过</el-button>
+        </el-col>
+        <el-col :span="1.5">
+          <el-button v-if="purchaseOrder.requests_status===2"
+            type="success"
+            icon="el-icon-close"
+            size="mini"
+            @click="handleSingleReject"
+          >取消采购</el-button>
+        </el-col>
+      </el-row>
+    </div>
   </div>
 
 
 </template>
 
 <script>
-  import {getItem} from '@/api/purchase/apply'
+  import {getItem,updateStatus} from '@/api/purchase/apply'
   import { getDicts } from '@/api/system/dict/data'
   import {getPage} from '@/api/purchase/log'
   export default {
@@ -102,26 +123,28 @@
       }
     },
     mounted(){
-      let purchaseRequestId = sessionStorage.getItem('purchaseRequestId');
-      this.purchaseRequestId = purchaseRequestId;
+      this.purchaseRequestId = sessionStorage.getItem('purchaseRequestId');
       getDicts('purchase_status').then(response => {
         this.orderStatusList = response.data
       })
-      getItem({id:purchaseRequestId}).then(response=>{
-        if(response && response.data){
-          let statusName = '';
-          this.orderStatusList.forEach(si=>{
-            if(si.dictValue===String(response.data.requests_status)){
-              statusName = si.dictLabel;
-            }
-          })
-          this.queryParams.purchase_request_id = response.data.purchase_request_id;
-          this.purchaseOrder = {...response.data,statusName:statusName}
-          this.getLogPage();
-        }
-      });
+      this.getOrderInfo();
     },
     methods:{
+      getOrderInfo(){
+        getItem({id:this.purchaseRequestId}).then(response=>{
+          if(response && response.data){
+            let statusName = '';
+            this.orderStatusList.forEach(si=>{
+              if(si.dictValue===String(response.data.requests_status)){
+                statusName = si.dictLabel;
+              }
+            })
+            this.queryParams.purchase_request_id = response.data.purchase_request_id;
+            this.purchaseOrder = {...response.data,statusName:statusName}
+            this.getLogPage();
+          }
+        });
+      },
       getLogPage(){
         getPage(this.queryParams).then(response=>{
           if(response.code===200){
@@ -139,7 +162,42 @@
             this.total = response.data.total;
           }
         })
-      }
+      },
+      handleSingleAudit(){
+        this.$confirm('是否确认审批通过 ?', '警告', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          updateStatus(this.purchaseRequestId, { requests_status: 3 }).then(response => {
+            if (response.code === 200) {
+              this.msgSuccess('操作成功')
+              this.open = false
+              this.getList()
+            } else {
+              this.msgError(response.msg)
+            }
+          })
+        })
+
+      },
+      handleSingleReject(){
+        this.$confirm('是否确认取消采购 ?', '警告', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          updateStatus(this.purchaseRequestId, { requests_status: 4 }).then(response => {
+            if (response.code === 200) {
+              this.msgSuccess('操作成功')
+              this.open = false
+              this.getList()
+            } else {
+              this.msgError(response.msg)
+            }
+          })
+        })
+      },
     }
   }
 </script>
