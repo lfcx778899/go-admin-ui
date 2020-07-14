@@ -51,25 +51,24 @@
         <el-button
           type="primary"
           icon="el-icon-check"
-          size="mini"
+          size="small"
           :disabled="single"
-          @click="handleAudit"
+          @click="handleQuotation"
         >创建询价单</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
           type="success"
-          icon="el-icon-close"
-          size="mini"
-          :disabled="single"
-          @click="handleReject"
+          icon="el-icon-d-arrow-right"
+          size="small"
+          @click="handleAllCreate"
         >全部询价</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
           type="success"
           icon="el-icon-close"
-          size="mini"
+          size="small"
           :disabled="single"
           @click="handleReject"
         >生成采购单</el-button>
@@ -138,6 +137,7 @@
   import {getAll} from "@/api/basic/product";
   import {getApprovals,create,deleteItem,updateItem,updateStatus} from '@/api/purchase/apply';
   import { getInUseSupplier } from '@/api/basic/supplier'
+  import {createQuotationControl,createAll} from '@/api/purchase/quotationControl';
 export default {
   name: 'Index',
   components: { Treeselect },
@@ -255,34 +255,6 @@ export default {
       this.resetForm('queryForm')
       this.handleQuery()
     },
-    handleAudit(){
-      let ids =[];
-      this.selectRows.forEach(item=>{
-        if(item.requests_status === 2){
-          ids.push(item.id)
-        }
-      })
-      if(ids.length>0){
-        this.$confirm('是否确认审批通过' + ids.length + '条采购申请?', '警告', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          let idStr = ids.join(',');
-          updateStatus(idStr, { requests_status: 3 }).then(response => {
-            if (response.code === 200) {
-              this.msgSuccess('操作成功')
-              this.open = false
-              this.getList()
-            } else {
-              this.msgError(response.msg)
-            }
-          })
-        })
-      }else{
-        this.msgInfo('没有选择可以操作的数据')
-      }
-    },
     handleReject(){
       let ids =[];
       this.selectRows.forEach(item=>{
@@ -315,25 +287,17 @@ export default {
       let supplierIds = row.supplier_ids;
       if(','.indexOf(supplierIds)>-1){
         this.msgError("可选供应商超过一个，不能进行确认")
+        return false;
       }
-
-
-
-      // this.$confirm('是否确认审批通过 ?', '警告', {
-      //   confirmButtonText: '确定',
-      //   cancelButtonText: '取消',
-      //   type: 'warning'
-      // }).then(() => {
-      //   updateStatus(row.id, { requests_status: 3 }).then(response => {
-      //     if (response.code === 200) {
-      //       this.msgSuccess('操作成功')
-      //       this.open = false
-      //       this.getList()
-      //     } else {
-      //       this.msgError(response.msg)
-      //     }
-      //   })
-      // })
+      updateStatus(row.id, { requests_status: 6 }).then(response => {
+        if (response.code === 200) {
+          this.msgSuccess('操作成功')
+          this.open = false
+          this.getList()
+        } else {
+          this.msgError(response.msg)
+        }
+      })
     },
     handleSingleReject(row){
       this.$confirm('是否确认取消采购 ?', '警告', {
@@ -354,8 +318,55 @@ export default {
     },
     handleDetail(row){
       sessionStorage.setItem("purchaseRequestId",row.id);
-      this.$router.push({path:'/purchase/approval/detail'})
+      this.$router.push({path:'/purchase/before-pur/detail'})
     },
+    handleAllCreate(){
+      this.$confirm('是否确认全部询价 ?', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const createData = {
+          remark:''
+        };
+        createAll(createData).then(response=>{
+          if (response.code === 200) {
+            this.msgSuccess('操作成功')
+            this.open = false
+            this.getList()
+          } else {
+            this.msgError(response.msg)
+          }
+        })
+      })
+    },
+    handleQuotation(){
+      let ids =[];
+      this.selectRows.forEach(item=>{
+        if(item.requests_status === 3){
+          ids.push(item.id)
+        }
+      })
+      if(ids.length>0){
+        this.$confirm('是否确认生成询价单?', '警告', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          updateStatus({purchase_request_ids:ids}).then(response => {
+            if (response.code === 200) {
+              this.msgSuccess('操作成功')
+              this.open = false
+              this.getList()
+            } else {
+              this.msgError(response.msg)
+            }
+          })
+        })
+      }else{
+        this.msgInfo('没有选择可以操作的数据')
+      }
+    }
   }
 }
 </script>

@@ -21,9 +21,11 @@
       </el-form-item>
     </el-form>
 
-    <el-table v-loading="loading" :data="purchaserequestsList" @selection-change="handleSelectionChange">
-      <el-table-column label="供应商名称" prop="requests_quantity" width="120" />
-      <el-table-column label="产品明细" prop="product_name" width="120" />
+    <el-table v-loading="loading" :data="showList">
+      <el-table-column label="供应商名称" prop="supplier_name" width="120" />
+      <el-table-column label="询价产品明细" prop="product_name" width="120" >
+
+      </el-table-column>
       <el-table-column label="创建时间" prop="created_at" width="200" >
         <template slot-scope="scope">
           <span>{{parseTime(scope.row.created_at)}}</span>
@@ -36,13 +38,13 @@
             size="small"
             type="success"
             icon="el-icon-view"
-            @click="handleDetail(scope.row)"
+            @click="handleUpLoad(scope.row)"
           >上传</el-button>
         </template>
       </el-table-column>
       <el-table-column label="状态" prop="requests_status" width="120" >
         <template slot-scope="scope">
-          <span>{{scope.row.statusName}}</span>
+          <span>{{scope.row.quotation_status===0? "待报价":"已报价"}}</span>
         </template>
       </el-table-column>
     </el-table>
@@ -53,11 +55,31 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
+
+
+    <!--<el-dialog :title="title" :visible.sync="open" width="500px">-->
+      <!--<el-form ref="form" :model="form" :rules="rules" label-width="100px">-->
+        <!--<el-form-item label="备注" prop="remark">-->
+          <!--<el-input v-model="form.remark" placeholder="备注" />-->
+        <!--</el-form-item>-->
+        <!--<el-form-item label="备注" prop="remark">-->
+          <!--<el-input v-model="form.remark" placeholder="备注" />-->
+        <!--</el-form-item>-->
+      <!--</el-form>-->
+      <!--<div slot="footer" class="dialog-footer">-->
+        <!--<el-button type="primary" @click="submitForm">确 定</el-button>-->
+        <!--<el-button @click="cancel">取 消</el-button>-->
+      <!--</div>-->
+    <!--</el-dialog>-->
+
+
+
   </div>
 </template>
 
 <script>
 import { getInUseSupplier } from '@/api/basic/supplier';
+import {getQuotationControlPage} from '@/api/purchase/quotationControl';
 
 export default {
   name: 'Index',
@@ -82,7 +104,7 @@ export default {
       typeOptions: [],
       productList:[],
       selectProductList:[],
-      purchaserequestsList:[],
+      showList:[],
       productTypeList:[],
       // 查询参数
       queryParams: {
@@ -106,7 +128,10 @@ export default {
   },
   methods:{
     getList(){
-
+      getQuotationControlPage(this.queryParams).then(response=>{
+        this.showList = response.data.items;
+        this.total =  response.data.total;
+      })
     },
     resetQuery() {
       this.queryParams = {
