@@ -19,6 +19,18 @@ export function downLoadZip(str, fileName) {
   })
 }
 
+export function downLoadXls(str, fileName) {
+  var url = baseUrl + str
+  axios({
+    method: 'get',
+    url: url,
+    responseType: 'blob',
+    headers: { 'Authorization': 'Bearer ' + getToken() }
+  }).then(res => {
+    resolveBlob(res, mimeMap.xlsx, fileName)
+  })
+}
+
 export function downLoadFile(str) {
   var url = baseUrl + str
   const aLink = document.createElement('a')

@@ -23,8 +23,15 @@
 
     <el-table v-loading="loading" :data="showList">
       <el-table-column label="供应商名称" prop="supplier_name" width="120" />
-      <el-table-column label="询价产品明细" prop="product_name" width="120" >
-
+      <el-table-column label="询价产品明细" width="120" >
+        <template slot-scope="scope">
+          <el-button
+            size="small"
+            type="primary"
+            icon="el-icon-download"
+            @click="downLoadProducts(scope.row)"
+          >下载产品明细</el-button>
+        </template>
       </el-table-column>
       <el-table-column label="创建时间" prop="created_at" width="200" >
         <template slot-scope="scope">
@@ -34,12 +41,18 @@
 
       <el-table-column label="报价单" prop="dept_name" width="120" >
         <template slot-scope="scope">
-          <el-button
+          <el-button v-if="scope.row.quotation_status===0"
             size="small"
             type="success"
             icon="el-icon-view"
             @click="handleUpLoad(scope.row)"
           >上传</el-button>
+          <el-button v-else
+                     size="small"
+                     type="primary"
+                     icon="el-icon-download"
+                     @click="handleUpLoad(scope.row)"
+          >下载报价单</el-button>
         </template>
       </el-table-column>
       <el-table-column label="状态" prop="requests_status" width="120" >
@@ -80,6 +93,7 @@
 <script>
 import { getInUseSupplier } from '@/api/basic/supplier';
 import {getQuotationControlPage} from '@/api/purchase/quotationControl';
+import {downLoadXls} from '@/utils/zipdownload'
 
 export default {
   name: 'Index',
@@ -145,6 +159,9 @@ export default {
       this.queryParams.pageIndex = 1
       this.getList()
     },
+    downLoadProducts(row){
+      downLoadXls(row.purchase_requests_detail_adress,'111.xlsx');
+    }
   }
 }
 </script>

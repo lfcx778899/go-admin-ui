@@ -46,3 +46,11 @@ export function changeStatus(id, data) {
     data: data
   })
 }
+
+export function getProductSupplier(query) {
+  return request({
+    url: '/api/product_price/get_all',
+    method: 'get',
+    params: query
+  })
+}

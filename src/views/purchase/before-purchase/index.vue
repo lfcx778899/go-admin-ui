@@ -332,7 +332,6 @@ export default {
         createAll(createData).then(response=>{
           if (response.code === 200) {
             this.msgSuccess('操作成功')
-            this.open = false
             this.getList()
           } else {
             this.msgError(response.msg)
@@ -344,7 +343,7 @@ export default {
       let ids =[];
       this.selectRows.forEach(item=>{
         if(item.requests_status === 3){
-          ids.push(item.id)
+          ids.push(item.purchase_request_id)
         }
       })
       if(ids.length>0){
@@ -353,7 +352,7 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          updateStatus({purchase_request_ids:ids}).then(response => {
+          createQuotationControl({purchase_request_ids:ids}).then(response => {
             if (response.code === 200) {
               this.msgSuccess('操作成功')
               this.open = false

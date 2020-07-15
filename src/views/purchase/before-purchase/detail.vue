@@ -54,6 +54,16 @@
             <span>{{purchaseOrder.requests_quantity}}</span>
           </el-form-item>
         </el-col>
+        <el-col :span="6">
+          <el-form-item label="供应商">
+            <span>{{purchaseOrder.supplier_names}}</span>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label="供应价格">
+            <span>{{purchaseOrder.supplier_names}}</span>
+          </el-form-item>
+        </el-col>
       </el-row>
     </el-form>
     <div class="detail-title">
@@ -85,7 +95,7 @@
             type="primary"
             icon="el-icon-check"
             size="mini"
-            @click="handleSingleAudit"
+            @click="handleChangeSupplier"
           >修改供应商</el-button>
         </el-col>
         <el-col :span="1.5">
@@ -93,7 +103,7 @@
                      type="primary"
                      icon="el-icon-check"
                      size="mini"
-                     @click="handleSingleAudit"
+                     @click="handleCheckSupplier"
           >确认供应商</el-button>
         </el-col>
         <el-col :span="1.5">
@@ -108,32 +118,42 @@
     </div>
 
     <el-dialog :title="title" :visible.sync="open" width="500px">
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="产品名称" prop="product_id"  >
+      <el-form ref="form" :model="form" label-width="80px">
+        <el-form-item label="供应商" prop="supplier_id"  v-if="!showPrice">
+        <el-select
+          v-model="form.ids"
+          placeholder="请选择产品"
+          clearable
+          multiple
+          size="small"
+          style="width: 360px"
+        >
+          <el-option
+            v-for="product in suppliers"
+            :key="product.id"
+            :label="product.supplier_name"
+            :value="product.supplier_id"
+          />
+        </el-select>
+      </el-form-item>
+        <el-form-item label="供应商" prop="supplier_id"  v-if="showPrice">
           <el-select
-            v-model="form.product_id"
+            v-model="form.supplier_id"
             placeholder="请选择产品"
             clearable
             size="small"
             style="width: 360px"
           >
             <el-option
-              v-for="product in productList"
+              v-for="product in suppliers"
               :key="product.id"
-              :label="product.product_name"
-              :value="product.product_id"
+              :label="product.supplier_name"
+              :value="product.supplier_id"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="申请数量" prop="requests_quantity"  >
-          <el-select v-model="form.supplier_ids" multiple placeholder="请选择">
-            <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
+        <el-form-item label="单价" prop="product_id"  v-if="showPrice">
+            <el-input-number :min="0.00" :step="0.01" v-model="form.price" style="width: 360px"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -151,6 +171,7 @@
   import {getItem,updateStatus} from '@/api/purchase/apply'
   import { getDicts } from '@/api/system/dict/data'
   import {getPage} from '@/api/purchase/log'
+  import {getInUseSupplier} from '@/api/basic/supplier'
   export default {
     name: 'detail',
     data(){
@@ -166,7 +187,11 @@
         loading:false,
         title: '',
         open: false,
-        form:{},
+        form:{
+          ids:[]
+        },
+        suppliers:[],
+        showPrice :false,
 
       }
     },
@@ -174,7 +199,10 @@
       this.purchaseRequestId = sessionStorage.getItem('purchaseRequestId');
       getDicts('purchase_status').then(response => {
         this.orderStatusList = response.data
-      })
+      });
+      getInUseSupplier().then(response=>{
+        this.suppliers = response.data.items;
+      });
       this.getOrderInfo();
     },
     methods:{
@@ -188,7 +216,7 @@
               }
             })
             this.queryParams.purchase_request_id = response.data.purchase_request_id;
-            this.purchaseOrder = {...response.data,statusName:statusName}
+            this.purchaseOrder = {...response.data,statusName:statusName};
             this.getLogPage();
           }
         });
@@ -211,23 +239,25 @@
           }
         })
       },
-      handleSingleAudit(){
-        this.$confirm('是否确认审批通过 ?', '警告', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          updateStatus(this.purchaseRequestId, { requests_status: 3 }).then(response => {
-            if (response.code === 200) {
-              this.msgSuccess('操作成功')
-              this.open = false
-              this.getList()
-            } else {
-              this.msgError(response.msg)
-            }
-          })
-        })
-
+      handleChangeSupplier(){
+        this.title = "选择供应商";
+        this.open = true;
+        if(this.purchaseOrder.supplier_ids){
+          this.form.ids = this.purchaseOrder.supplier_ids.split(',');
+        }
+      },
+      handleCheckSupplier(){
+        this.title = "确认供应商";
+        this.open = true;
+        this.showPrice = true;
+      },
+      cancel(){
+        this.title = "";
+        this.open = false;
+        this.showPrice = false;
+      },
+      submitForm(){
+        console.log(this.showPrice);
       },
       handleSingleReject(){
         this.$confirm('是否确认取消采购 ?', '警告', {
