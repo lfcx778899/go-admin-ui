@@ -53,6 +53,7 @@
           icon="el-icon-check"
           size="small"
           @click="handleQuotation"
+          :disabled="multiple"
         >创建询价单
         </el-button>
       </el-col>
@@ -70,6 +71,7 @@
           type="success"
           icon="el-icon-close"
           size="small"
+          :disabled="multiple"
           @click="handleCreatePurchaseControl"
         >生成采购单
         </el-button>

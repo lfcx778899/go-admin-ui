@@ -71,7 +71,7 @@
           type="success"
           icon="el-icon-edit"
           size="mini"
-          :disabled="single"
+          :disabled="multiple"
           @click="handleApplyOrder"
         >提交</el-button>
       </el-col>
@@ -97,7 +97,7 @@
       <!--<el-table-column label="备注" prop="remark" width="360" />-->
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="360">
         <template slot-scope="scope">
-          <el-button
+          <el-button v-if="scope.row.requests_status===1"
             size="small"
             type="primary"
             icon="el-icon-edit"
@@ -109,13 +109,13 @@
             icon="el-icon-view"
             @click="handleDetail(scope.row)"
           >详情</el-button>
-          <el-button
+          <el-button v-if="scope.row.requests_status===1"
             size="small"
             type="warning"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
           >删除</el-button>
-          <el-button
+          <el-button v-if="scope.row.requests_status===1"
             size="small"
             type="success"
             icon="el-icon-upload"

@@ -38,7 +38,7 @@
           type="primary"
           icon="el-icon-check"
           size="mini"
-          :disabled="single"
+          :disabled="multiple"
           @click="handleAudit"
         >审批通过</el-button>
       </el-col>
@@ -47,7 +47,7 @@
           type="success"
           icon="el-icon-close"
           size="mini"
-          :disabled="single"
+          :disabled="multiple"
           @click="handleReject"
         >取消采购</el-button>
       </el-col>

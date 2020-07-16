@@ -80,53 +80,6 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
-
-    <!-- 添加或修改对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px">
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-
-        <el-form-item label="" prop="purchaseControlId"  >
-          <el-input v-model="form.purchaseControlId" placeholder=""  />
-        </el-form-item>
-        <el-form-item label="采购状态，0 新建，1.确认采购，2，已入库，3，待付款，4.已付款" prop="purchaseStatus"  >
-          <el-input v-model="form.purchaseStatus" placeholder="采购状态，0 新建，1.确认采购，2，已入库，3，待付款，4.已付款"  />
-        </el-form-item>
-        <el-form-item label="供应商ID" prop="supplierId"  >
-          <el-input v-model="form.supplierId" placeholder="供应商ID"  />
-        </el-form-item>
-        <el-form-item label="总金额" prop="totalamountWithoutTax"  >
-          <el-input v-model="form.totalamountWithoutTax" placeholder="总金额"  />
-        </el-form-item>
-        <el-form-item label="合同附件地址" prop="contractAdress"  >
-          <el-input v-model="form.contractAdress" placeholder="合同附件地址"  />
-        </el-form-item>
-        <el-form-item label="确认采购时间" prop="purchaseOrderTime"  >
-          <el-input v-model="form.purchaseOrderTime" placeholder="确认采购时间"  />
-        </el-form-item>
-        <el-form-item label="付款时间" prop="paymentTime"  >
-          <el-input v-model="form.paymentTime" placeholder="付款时间"  />
-        </el-form-item>
-        <el-form-item label="已入库数量" prop="storagedTotalQuantity"  >
-          <el-input v-model="form.storagedTotalQuantity" placeholder="已入库数量"  />
-        </el-form-item>
-        <el-form-item label="已入库金额" prop="storagedAmountWithoutTax"  >
-          <el-input v-model="form.storagedAmountWithoutTax" placeholder="已入库金额"  />
-        </el-form-item>
-        <el-form-item label="入库完成时间" prop="storagedFinishedTime"  >
-          <el-input v-model="form.storagedFinishedTime" placeholder="入库完成时间"  />
-        </el-form-item>
-        <el-form-item label="付款对账单，发票等附件" prop="paymentRelatedAdress"  >
-          <el-input v-model="form.paymentRelatedAdress" placeholder="付款对账单，发票等附件"  />
-        </el-form-item>
-        <el-form-item label="" prop="remark"  >
-          <el-input v-model="form.remark" placeholder=""  />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
-        <el-button @click="cancel">取 消</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
@@ -161,13 +114,13 @@ export default {
       queryParams: {
         pageIndex: 1,
         pageSize: 10,
-
       },
       // 表单参数
-      form: {
-      },
+      form: {},
       // 表单校验
-      rules: {}
+      rules: {},
+      inUseSupplier:[],
+      purchasecontrolList:[],
     }
   },
   created() {

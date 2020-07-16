@@ -34,3 +34,11 @@ export function getPurchaseControlProduct(query) {
     params: query
   })
 }
+
+export function uploadContract(id,data) {
+  return request({
+    url: '/api/purchase_control/upload/'+id,
+    method: 'post',
+    data: data
+  })
+}

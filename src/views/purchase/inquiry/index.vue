@@ -72,7 +72,7 @@
 
     <el-dialog :title="title" :visible.sync="open" width="500px">
       <el-form ref="form" label-width="100px">
-        <el-form-item label="备注" prop="remark">
+        <el-form-item label="选择文件" prop="remark">
           <el-upload
                      :limit=1
                      :auto-upload="false"
@@ -84,7 +84,7 @@
                      :on-success="handleSuccess"
                      :on-error="handleError"
                      :file-list="fileList">
-            <i class="el-icon-upload"></i>
+            <el-button size="small" type="primary">点击上传</el-button>
           </el-upload>
         </el-form-item>
       </el-form>
@@ -103,7 +103,6 @@
 import { getInUseSupplier } from '@/api/basic/supplier';
 import {getQuotationControlPage,uploadXlsx} from '@/api/purchase/quotationControl';
 import {downLoadXls} from '@/utils/zipdownload'
-import axios from 'axios';
 
 export default {
   name: 'Index',
