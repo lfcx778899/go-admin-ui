@@ -11,7 +11,7 @@
             v-for="dict in inUseSupplier"
             :key="dict.id"
             :label="dict.supplier_name"
-            :value="dict.supplier_name"
+            :value="dict.supplier_id"
           />
         </el-select>
       </el-form-item>
