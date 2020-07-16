@@ -61,7 +61,7 @@
         </el-col>
         <el-col :span="6">
           <el-form-item label="供应价格">
-            <span>{{purchaseOrder.supplier_names}}</span>
+            <span>{{purchaseOrder.product_price_withouttax}}</span>
           </el-form-item>
         </el-col>
       </el-row>
@@ -99,7 +99,7 @@
           >修改供应商</el-button>
         </el-col>
         <el-col :span="1.5">
-          <el-button v-if="purchaseOrder.requests_status===3"
+          <el-button v-if="purchaseOrder.requests_status===3 ||purchaseOrder.requests_status===5"
                      type="primary"
                      icon="el-icon-check"
                      size="mini"
@@ -122,7 +122,7 @@
         <el-form-item label="供应商" prop="supplier_id"  v-if="!showPrice">
         <el-select
           v-model="form.ids"
-          placeholder="请选择产品"
+          placeholder="请选择供应商"
           clearable
           multiple
           size="small"
@@ -139,13 +139,14 @@
         <el-form-item label="供应商" prop="supplier_id"  v-if="showPrice">
           <el-select
             v-model="form.supplier_id"
-            placeholder="请选择产品"
+            placeholder="请选择供应商"
             clearable
             size="small"
             style="width: 360px"
+            @change="changeSupplier"
           >
             <el-option
-              v-for="product in suppliers"
+              v-for="product in checkList"
               :key="product.id"
               :label="product.supplier_name"
               :value="product.supplier_id"
@@ -168,10 +169,11 @@
 </template>
 
 <script>
-  import {getItem,updateStatus} from '@/api/purchase/apply'
+  import {getItem,updateStatus,updateItem} from '@/api/purchase/apply'
   import { getDicts } from '@/api/system/dict/data'
   import {getPage} from '@/api/purchase/log'
   import {getInUseSupplier} from '@/api/basic/supplier'
+  import {updateItem as updateProductPrice,getProductSupplier} from '@/api/basic/productPrice'
   export default {
     name: 'detail',
     data(){
@@ -192,7 +194,8 @@
         },
         suppliers:[],
         showPrice :false,
-
+        ProductSuppliers:[],
+        checkList:[],
       }
     },
     mounted(){
@@ -203,6 +206,7 @@
       getInUseSupplier().then(response=>{
         this.suppliers = response.data.items;
       });
+
       this.getOrderInfo();
     },
     methods:{
@@ -217,9 +221,23 @@
             })
             this.queryParams.purchase_request_id = response.data.purchase_request_id;
             this.purchaseOrder = {...response.data,statusName:statusName};
+            this.product_id = response.data.product_id;
+            this.getProductSuppliers();
             this.getLogPage();
           }
         });
+      },
+      getProductSuppliers(){
+        getProductSupplier({product_id :this.product_id}).then(resp=>{
+          this.ProductSuppliers = resp.data.items;
+        })
+      },
+      changeSupplier(){
+        this.ProductSuppliers.forEach(supplier=>{
+          if(supplier.supplier_id === this.form.supplier_id){
+            this.form.price = supplier.product_price_withouttax
+          }
+        })
       },
       getLogPage(){
         getPage(this.queryParams).then(response=>{
@@ -250,14 +268,71 @@
         this.title = "确认供应商";
         this.open = true;
         this.showPrice = true;
+        let tempList =[];
+        this.ProductSuppliers.forEach(supplier=>{
+          let selectList = this.purchaseOrder.supplier_ids.split(',');
+          selectList.forEach(id=>{
+            if(supplier.supplier_id === id){
+              tempList.push(supplier);
+            }
+          })
+        })
+        this.checkList = tempList;
       },
       cancel(){
         this.title = "";
+        this.form = {};
         this.open = false;
         this.showPrice = false;
       },
       submitForm(){
-        console.log(this.showPrice);
+        //确认供应商
+        if(this.showPrice){
+          let updateData = {
+            supplier_ids: this.form.supplier_id
+          }
+          updateItem(this.purchaseRequestId,updateData).then(response=>{
+            if (response.code === 200) {
+              updateStatus(this.purchaseRequestId,{requests_status:6}).then(resp=>{
+                if (response.code === 200) {
+                  let priceId ='';
+                  this.ProductSuppliers.forEach(supplier=>{
+                    if(supplier.supplier_id === this.form.supplier_id){
+                      priceId = supplier.id;
+                    }
+                  })
+                  updateProductPrice(priceId,{product_price_withouttax:Number(this.form.price)}).then(r=>{
+                    if (r.code === 200) {
+                      this.msgSuccess('操作成功')
+                      this.cancel()
+                      this.getOrderInfo()
+                    } else {
+                      this.msgError(r.msg)
+                    }
+                  })
+                } else {
+                  this.msgError(resp.msg)
+                }
+              })
+            } else {
+              this.msgError(response.msg)
+            }
+          })
+        }else{
+          //修改供应商
+        let updateData = {
+          supplier_ids: this.form.ids.join(',')
+        }
+          updateItem(this.purchaseRequestId,updateData).then(response=>{
+            if (response.code === 200) {
+              this.msgSuccess('操作成功')
+              this.cancel()
+              this.getOrderInfo()
+            } else {
+              this.msgError(response.msg)
+            }
+          })
+        }
       },
       handleSingleReject(){
         this.$confirm('是否确认取消采购 ?', '警告', {

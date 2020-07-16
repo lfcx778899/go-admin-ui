@@ -87,7 +87,7 @@
       </el-row>
     </div>
     <el-table v-loading="loading" :data="supplierPriceList">
-      <el-table-column label="供应商名称" prop="supplier_id" width="300" />
+      <el-table-column label="供应商名称" prop="supplier_name" width="300" />
       <el-table-column label="产品价格" prop="product_price_withouttax" width="150" />
       <el-table-column label="价格单位" prop="price_unit" width="250" />
       <el-table-column label="税率" prop="tax_rate" width="100" />
@@ -140,7 +140,7 @@
               v-for="dict in inUseSupplier"
               :key="dict.id"
               :label="dict.supplier_name"
-              :value="dict.supplier_name"
+              :value="dict.supplier_id"
             />
           </el-select>
         </el-form-item>

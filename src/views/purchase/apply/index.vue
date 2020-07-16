@@ -91,9 +91,9 @@
           <span>{{scope.row.statusName}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="产品类别" prop="product_type" width="100" />
-      <el-table-column label="产品名称" prop="product_name" width="120" />
-      <el-table-column label="申请数量" prop="requests_quantity" width="120" />
+      <el-table-column label="产品类别" prop="product_type"/>
+      <el-table-column label="产品名称" prop="product_name" />
+      <el-table-column label="申请数量" prop="requests_quantity"/>
       <!--<el-table-column label="备注" prop="remark" width="360" />-->
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="360">
         <template slot-scope="scope">

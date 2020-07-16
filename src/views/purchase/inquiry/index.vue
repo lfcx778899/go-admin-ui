@@ -22,8 +22,8 @@
     </el-form>
 
     <el-table v-loading="loading" :data="showList">
-      <el-table-column label="供应商名称" prop="supplier_name" width="120" />
-      <el-table-column label="询价产品明细" width="120" >
+      <el-table-column label="供应商名称" prop="supplier_name"/>
+      <el-table-column label="询价产品明细">
         <template slot-scope="scope">
           <el-button
             size="small"
@@ -39,7 +39,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="报价单" prop="dept_name" width="120" >
+      <el-table-column label="报价单" prop="dept_name">
         <template slot-scope="scope">
           <el-button v-if="scope.row.quotation_status===0"
             size="small"
@@ -51,11 +51,11 @@
                      size="small"
                      type="primary"
                      icon="el-icon-download"
-                     @click="handleUpLoad(scope.row)"
+                     @click="downLoadBJD(scope.row)"
           >下载报价单</el-button>
         </template>
       </el-table-column>
-      <el-table-column label="状态" prop="requests_status" width="120" >
+      <el-table-column label="状态" prop="requests_status">
         <template slot-scope="scope">
           <span>{{scope.row.quotation_status===0? "待报价":"已报价"}}</span>
         </template>
@@ -70,20 +70,29 @@
     />
 
 
-    <!--<el-dialog :title="title" :visible.sync="open" width="500px">-->
-      <!--<el-form ref="form" :model="form" :rules="rules" label-width="100px">-->
-        <!--<el-form-item label="备注" prop="remark">-->
-          <!--<el-input v-model="form.remark" placeholder="备注" />-->
-        <!--</el-form-item>-->
-        <!--<el-form-item label="备注" prop="remark">-->
-          <!--<el-input v-model="form.remark" placeholder="备注" />-->
-        <!--</el-form-item>-->
-      <!--</el-form>-->
-      <!--<div slot="footer" class="dialog-footer">-->
-        <!--<el-button type="primary" @click="submitForm">确 定</el-button>-->
-        <!--<el-button @click="cancel">取 消</el-button>-->
-      <!--</div>-->
-    <!--</el-dialog>-->
+    <el-dialog :title="title" :visible.sync="open" width="500px">
+      <el-form ref="form" label-width="100px">
+        <el-form-item label="备注" prop="remark">
+          <el-upload
+                     :limit=1
+                     :auto-upload="false"
+                     accept=".xlsx"
+                     :action="UploadUrl()"
+                     :before-upload="beforeUploadFile"
+                     :on-change="fileChange"
+                     :on-exceed="exceedFile"
+                     :on-success="handleSuccess"
+                     :on-error="handleError"
+                     :file-list="fileList">
+            <i class="el-icon-upload"></i>
+          </el-upload>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="uploadFile">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
 
 
 
@@ -92,8 +101,9 @@
 
 <script>
 import { getInUseSupplier } from '@/api/basic/supplier';
-import {getQuotationControlPage} from '@/api/purchase/quotationControl';
+import {getQuotationControlPage,uploadXlsx} from '@/api/purchase/quotationControl';
 import {downLoadXls} from '@/utils/zipdownload'
+import axios from 'axios';
 
 export default {
   name: 'Index',
@@ -132,6 +142,7 @@ export default {
       selectRows:[],
       inUseSupplier:[],
       deptOptions: undefined,
+      fileList:[],
     }
   },
   created() {
@@ -160,7 +171,66 @@ export default {
       this.getList()
     },
     downLoadProducts(row){
-      downLoadXls(row.purchase_requests_detail_adress,'111.xlsx');
+      let filePath = row.purchase_requests_detail_adress.split('/');
+      downLoadXls(row.purchase_requests_detail_adress,filePath[filePath.length-1]);
+    },
+    downLoadBJD(row){
+      let filePath = row.quotation_adress.split('/');
+      downLoadXls(row.quotation_adress,filePath[filePath.length-1]);
+    },
+    handleUpLoad(row){
+      this.title = "上传报价单";
+      this.id = row.id;
+      this.open = true;
+    },
+    UploadUrl(){
+      return "";
+    },
+    cancel(){
+      this.title = "";
+      this.open = false;
+    },
+    exceedFile(files, fileList) {
+      this.msgError("选择多个文件");
+    },
+    fileChange(file, fileList) {
+      this.fileList.push(file.raw) ;
+    },
+    beforeUploadFile(file) {
+      let extension = file.name.substring(file.name.lastIndexOf('.')+1);
+      let size = file.size / 1024 / 1024;
+      if(extension !== 'xlsx') {
+        this.msgError("只能上传后缀是.xlsx的文件");
+      }
+      if(size > 4) {
+        this.msgError("文件大小不得超过4M");
+      }
+    },
+    // 文件上传成功时的钩子
+    handleSuccess(res, file, fileList) {
+      this.msgSuccess('文件上传成功')
+    },
+    // 文件上传失败时的钩子
+    handleError(err, file, fileList) {
+      this.msgError("文件上传失败");
+    },
+    uploadFile() {
+      if (this.fileList.length === 0){
+        this.msgError("请上传文件");
+      } else {
+        let form = new FormData();
+        form.append('file', this.fileList[0]);
+
+        uploadXlsx(this.id,form).then(resp=>{
+          if (resp.code === 200) {
+            this.msgSuccess('操作成功')
+            this.open = false
+            this.getList()
+          } else {
+            this.msgError(resp.msg)
+          }
+        })
+      }
     }
   }
 }

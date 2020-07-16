@@ -49,9 +49,9 @@
 
     <el-table v-loading="loading" :data="showList">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="供应商编码" prop="supplier_id" width="120" />
+      <el-table-column label="供应商编码" prop="supplier_id" width="250" />
       <el-table-column label="供应商名称" prop="supplier_name" width="150" />
-      <el-table-column label="供应商地址" prop="supplier_adress" width="250" />
+      <el-table-column label="供应商地址" prop="supplier_adress" />
       <el-table-column label="联系人" prop="contact_name" width="100" />
       <el-table-column label="联系电话" prop="contact_phone" width="120" />
       <el-table-column label="联系QQ" prop="contact_qq" width="120" />
@@ -173,7 +173,7 @@ export default {
       this.getListData()
     },
     statusIcon(row){
-      return row.supplier_status===0? 'el-icon-check':'el-icon-close';
+      return row.supplier_status===0? 'el-icon-close':'el-icon-check';
     },
     resetQuery() {
       this.queryParams ={ pageIndex: 1, pageSize: 10 }

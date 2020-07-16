@@ -36,3 +36,10 @@ export function updateQuotationControlItem(id, data) {
   })
 }
 
+export function uploadXlsx(id,data) {
+  return request({
+    url: '/api/quotation_control/upload/'+id,
+    method: 'post',
+    data: data
+  })
+}

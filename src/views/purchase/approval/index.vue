@@ -61,16 +61,16 @@
           <span>{{parseTime(scope.row.created_at)}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="部门名称" prop="dept_name" width="120" />
+      <el-table-column label="部门名称" prop="dept_name"/>
       <el-table-column label="申请人" prop="create_by_name" width="120" />
       <el-table-column label="状态" prop="requests_status" width="120" >
         <template slot-scope="scope">
           <span>{{scope.row.statusName}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="产品类别" prop="product_type" width="100" />
-      <el-table-column label="产品名称" prop="product_name" width="120" />
-      <el-table-column label="申请数量" prop="requests_quantity" width="120" />
+      <el-table-column label="产品类别" prop="product_type"/>
+      <el-table-column label="产品名称" prop="product_name"/>
+      <el-table-column label="申请数量" prop="requests_quantity"/>
       <el-table-column label="操作" align="left" class-name="small-padding fixed-width" width="360">
         <template slot-scope="scope">
           <el-button v-if="scope.row.requests_status===2"

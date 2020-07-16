@@ -46,10 +46,10 @@
 
     <el-table v-loading="loading" :data="productList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="产品ID" prop="product_id" width="300" />
+      <el-table-column label="产品ID" prop="product_id" width="200" />
       <el-table-column label="产品类别" prop="product_type" width="150" />
-      <el-table-column label="产品名称" prop="product_name" width="250" />
-      <el-table-column label="英文名称" prop="product_english_name" width="100" />
+      <el-table-column label="产品名称" prop="product_name" width="120" />
+      <el-table-column label="英文名称" prop="product_english_name"/>
       <el-table-column label="CASNO号" prop="product_casno" width="120" />
       <el-table-column label="货号" prop="product_item_number" width="120" />
       <el-table-column label="品牌" prop="product_brand_name" width="120" />
