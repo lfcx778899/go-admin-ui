@@ -148,19 +148,22 @@ export default {
       )
     },
     getStatusName(statusId){
-      if(statusId ===0){
+      if(statusId ===1){
         return "新建"
       }
-      if(statusId ===1){
+      if(statusId ===2){
         return "确认采购"
       }
-      if(statusId ===2){
+      if(statusId ===3){
         return "已入库"
       }
-      if(statusId ===3){
+      if(statusId ===4){
+        return "部分入库"
+      }
+      if(statusId ===5){
         return "待付款"
       }
-      if(statusId ===4){
+      if(statusId ===6){
         return "已付款"
       }
       return ""

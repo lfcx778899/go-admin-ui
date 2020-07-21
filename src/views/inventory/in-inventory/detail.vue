@@ -53,6 +53,24 @@
     <div class="detail-title">
       <h3>商品明细</h3>
     </div>
+    <el-row :gutter="10" class="mb8" style="margin-top: 20px;margin-bottom: 20px">
+      <el-col :span="1.5">
+        <el-button
+          type="primary"
+          icon="el-icon-plus"
+          size="mini"
+          @click="handleAdd"
+        >入库</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="primary"
+          icon="el-icon-plus"
+          size="mini"
+          @click="handleAdd"
+        >全部入库</el-button>
+      </el-col>
+    </el-row>
     <el-table v-loading="loading" :data="logList">
       <el-table-column label="类型名称" prop="product_type" width="150" />
       <el-table-column label="商品名称" prop="product_name" width="150" />

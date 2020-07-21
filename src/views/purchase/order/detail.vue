@@ -78,7 +78,7 @@
     <div style="margin-top: 20px">
       <el-row :gutter="10" class="mb8">
         <el-col :span="1.5">
-          <el-button v-if="purchaseControlOrder.purchase_status===0"
+          <el-button v-if="purchaseControlOrder.purchase_status===1"
                      type="primary"
                      icon="el-icon-check"
                      size="mini"
@@ -86,7 +86,7 @@
           >确认采购</el-button>
         </el-col>
         <el-col :span="1.5">
-          <el-button v-if="purchaseControlOrder.purchase_status===1 && !purchaseControlOrder.contract_adress"
+          <el-button v-if="purchaseControlOrder.purchase_status===2 && !purchaseControlOrder.contract_adress"
                      type="success"
                      icon="el-icon-close"
                      size="mini"
@@ -123,7 +123,7 @@
 </template>
 
 <script>
-  import { getPurchaseControlItem ,getPurchaseControlProduct,uploadContract} from '@/api/purchase/purchaseControl'
+  import { getPurchaseControlItem ,getPurchaseControlProduct,uploadContract,updateStatus} from '@/api/purchase/purchaseControl'
   import {downLoadZip} from "@/utils/zipdownload";
   export default {
     name: 'detail',
@@ -158,19 +158,22 @@
         return "";
       },
       getStatusName(statusId){
-        if(statusId ===0){
+        if(statusId ===1){
           return "新建"
         }
-        if(statusId ===1){
+        if(statusId ===2){
           return "确认采购"
         }
-        if(statusId ===2){
+        if(statusId ===3){
           return "已入库"
         }
-        if(statusId ===3){
+        if(statusId ===4){
+          return "部分入库"
+        }
+        if(statusId ===5){
           return "待付款"
         }
-        if(statusId ===4){
+        if(statusId ===6){
           return "已付款"
         }
         return ""
@@ -232,7 +235,16 @@
           })
         }
         if(this.fileList.length===0 || uploadresult){
-
+          let statusData = {purchase_status:2};
+          updateStatus(this.purchaseControlId,statusData).then(resp=>{
+            if (resp.code === 200){
+              uploadresult = true;
+              this.open = false;
+              this.getOrderInfo();
+            }else{
+              this.msgError(resp.msg)
+            }
+          })
         }
       }
     }

@@ -42,3 +42,11 @@ export function uploadContract(id,data) {
     data: data
   })
 }
+
+export function updateStatus(id,data) {
+  return request({
+    url: '/api/purchase_control/update_status/'+id,
+    method: 'put',
+    data: data
+  })
+}
