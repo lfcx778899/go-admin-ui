@@ -50,3 +50,19 @@ export function updateStatus(id,data) {
     data: data
   })
 }
+
+export function wareHouse(data) {
+  return request({
+    url: '/api/purchase_control_product_detail/warehouse',
+    method: 'post',
+    data: data
+  })
+}
+
+export function wareHouseAll(data) {
+  return request({
+    url: '/api/purchase_control_product_detail/warehouse_all',
+    method: 'post',
+    data: data
+  })
+}

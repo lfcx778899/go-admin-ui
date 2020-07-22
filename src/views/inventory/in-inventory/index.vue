@@ -117,7 +117,7 @@
 
         // 查询参数
         queryParams: {
-          purchase_status:'5,6',
+          purchase_status:'2,3,4',
           pageIndex: 1,
           pageSize: 10,
         },

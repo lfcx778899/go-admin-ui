@@ -112,6 +112,7 @@ export default {
 
       // 查询参数
       queryParams: {
+        purchase_status:'1,2',
         pageIndex: 1,
         pageSize: 10,
       },

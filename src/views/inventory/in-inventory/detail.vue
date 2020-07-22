@@ -55,19 +55,19 @@
     </div>
     <el-row :gutter="10" class="mb8" style="margin-top: 20px;margin-bottom: 20px">
       <el-col :span="1.5">
-        <el-button
+        <el-button v-if="purchaseControlOrder.totalpruchase_quantity>purchaseControlOrder.storaged_total_quantity"
           type="primary"
-          icon="el-icon-plus"
+          icon="el-icon-arrow-right"
           size="mini"
-          @click="handleAdd"
+          @click="handleIn"
         >入库</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button
+        <el-button v-if="purchaseControlOrder.totalpruchase_quantity>purchaseControlOrder.storaged_total_quantity"
           type="primary"
-          icon="el-icon-plus"
+          icon="el-icon-d-arrow-right"
           size="mini"
-          @click="handleAdd"
+          @click="handleAllIn"
         >全部入库</el-button>
       </el-col>
     </el-row>
@@ -88,23 +88,33 @@
       @pagination="getProductPage"
     />
 
-    <div style="margin-top: 20px">
-      <el-row :gutter="10" class="mb8">
-        <el-col :span="1.5">
-          <el-button v-if="purchaseControlOrder.purchase_status===5"
-                     type="primary"
-                     icon="el-icon-check"
-                     size="mini"
-                     @click="handleSingleAudit"
-          >确认付款</el-button>
-        </el-col>
-      </el-row>
-    </div>
+    <el-dialog title="入库" :visible.sync="open" width="800px">
+      <el-table :data="productList">
+        <el-table-column label="类型名称" prop="product_type" width="150" />
+        <el-table-column label="商品名称" prop="product_name" width="150" />
+        <el-table-column label="采购数量" prop="pruchase_quantity" width="100" />
+        <el-table-column label="单价" prop="unitprice_without_tax" width="100" />
+        <el-table-column label="总金额" prop="amount_without_tax" width="100"/>
+        <el-table-column label="入库数量" prop="storaged_quantity" width="100" />
+        <el-table-column label="入库数量" prop="inQty" width="100" >
+          <template slot-scope="scope">
+            <el-input-number v-model="scope.row.inQty" controls-position="right" :min="0" :step="1" :max="scope.row.pruchase_quantity" style="width: 100px" @change="changeInQty(scope.row)"/>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
+
+
+
   </div>
 </template>
 
 <script>
-  import { getPurchaseControlItem ,getPurchaseControlProduct,uploadContract,updateStatus} from '@/api/purchase/purchaseControl'
+  import { getPurchaseControlItem ,getPurchaseControlProduct,uploadContract,updateStatus,wareHouse,wareHouseAll} from '@/api/purchase/purchaseControl'
   import {downLoadZip} from "@/utils/zipdownload";
   export default {
     name: 'detail',
@@ -119,6 +129,11 @@
         total:0,
         logList:[],
         loading:false,
+        open:false,
+        form:{},
+        productList:[],
+        inList:[],
+
       }
     },
     mounted(){
@@ -162,22 +177,45 @@
           }
         })
       },
-      handleSingleAudit(){
-        this.$confirm('是否确认付款?', '警告', {
+      handleAllIn(){
+        this.$confirm('是否确认全部入库?', '警告', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(()=>{
-          updateStatus(this.purchaseControlId,{requests_status:6}).then(response=>{
+          wareHouseAll({purchase_control_id:this.purchaseControlId}).then(response=>{
             if (response.code === 200) {
               this.msgSuccess('操作成功');
-              this.getOrderInfo()
+              this.getOrderInfo();
+              this.getProductPage();
             } else {
               this.msgError(response.msg)
             }
           })
         })
-      }
+      },
+      handleIn(){
+        this.open = true;
+        this.productList = this.logList;
+      },
+      cancel(){
+        this.open = false;
+        this.productList =[];
+        this.inList =[];
+      },
+      changeInQty(row){
+        let tempList=[];
+        this.inList.forEach(item=>{
+          if(item.id !== row.id){
+            tempList.push({...item})
+          }
+        });
+        tempList.push({id:row.id,inQty:row.inQty});
+        this.inList = tempList;
+      },
+      submitForm(){
+
+      },
     }
   }
 </script>

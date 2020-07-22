@@ -73,7 +73,7 @@
     <div style="margin-top: 20px">
       <el-row :gutter="10" class="mb8">
         <el-col :span="1.5">
-          <el-button v-if="purchaseControlOrder.purchase_status===5"
+          <el-button v-if="purchaseControlOrder.purchase_status===3 || purchaseControlOrder.purchase_status===5"
                      type="primary"
                      icon="el-icon-check"
                      size="mini"
