@@ -66,3 +66,11 @@ export function wareHouseAll(data) {
     data: data
   })
 }
+//获取采购单明细列表
+export function getPurchaseControlProductDetail(query) {
+  return request({
+    url: '/api/purchase_control_product_detail/get_all',
+    method: 'get',
+    params: query
+  })
+}

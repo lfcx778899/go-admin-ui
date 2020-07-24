@@ -88,6 +88,28 @@
       @pagination="getProductPage"
     />
 
+    <div class="detail-title" style="margin-top: 20px;">
+      <h3>入库明细</h3>
+    </div>
+
+    <el-table v-loading="loading" :data="inLogList">
+      <el-table-column label="入库时间" prop="product_type">
+        <template slot-scope="scope">
+          <span>{{parseTime(scope.row.created_at)}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="类型名称" prop="product_type"/>
+      <el-table-column label="商品名称" prop="product_name"/>
+      <el-table-column label="入库数量" prop="storaged_quantity"/>
+    </el-table>
+    <pagination
+      v-show="inTotal>0"
+      :total="inTotal"
+      :page.sync="inQueryParams.pageIndex"
+      :limit.sync="inQueryParams.pageSize"
+      @pagination="getInPage"
+    />
+
     <el-dialog title="入库" :visible.sync="open" width="800px">
       <el-table :data="productList">
         <el-table-column label="类型名称" prop="product_type" width="150" />
@@ -95,7 +117,7 @@
         <el-table-column label="采购数量" prop="pruchase_quantity" width="100" />
         <el-table-column label="单价" prop="unitprice_without_tax" width="100" />
         <el-table-column label="总金额" prop="amount_without_tax" width="100"/>
-        <el-table-column label="入库数量" prop="storaged_quantity" width="100" />
+        <el-table-column label="已入库数量" prop="storaged_quantity" width="100" />
         <el-table-column label="入库数量" prop="inQty" width="100" >
           <template slot-scope="scope">
             <el-input-number v-model="scope.row.inQty" controls-position="right" :min="0" :step="1" :max="scope.row.pruchase_quantity" style="width: 100px" @change="changeInQty(scope.row)"/>
@@ -108,14 +130,13 @@
       </div>
     </el-dialog>
 
-
-
   </div>
 </template>
 
 <script>
-  import { getPurchaseControlItem ,getPurchaseControlProduct,uploadContract,updateStatus,wareHouse,wareHouseAll} from '@/api/purchase/purchaseControl'
+  import { getPurchaseControlItem ,getPurchaseControlProduct,uploadContract,updateStatus,wareHouse,wareHouseAll,getPurchaseControlProductDetail} from '@/api/purchase/purchaseControl'
   import {downLoadZip} from "@/utils/zipdownload";
+  import {getInLogPage} from '@/api/purchase/log'
   export default {
     name: 'detail',
     data(){
@@ -133,14 +154,22 @@
         form:{},
         productList:[],
         inList:[],
-
+        inQueryParams:{
+          purchase_control_id :'',
+          pageIndex: 1,
+          pageSize: 10
+        },
+        inTotal:0,
+        inLogList:[],
       }
     },
     mounted(){
       this.purchaseControlId = sessionStorage.getItem('purchaseControlId');
       this.queryParams.purchase_control_id = this.purchaseControlId;
+      this.inQueryParams.purchase_control_id = this.purchaseControlId;
       this.getOrderInfo();
       this.getProductPage();
+      this.getInPage();
     },
     methods:{
       getOrderInfo(){
@@ -177,6 +206,14 @@
           }
         })
       },
+      getInPage(){
+        getInLogPage(this.inQueryParams).then(response=>{
+          if(response.code===200){
+            this.inLogList = response.data.items;
+            this.inTotal = response.data.total;
+          }
+        })
+      },
       handleAllIn(){
         this.$confirm('是否确认全部入库?', '警告', {
           confirmButtonText: '确定',
@@ -196,7 +233,16 @@
       },
       handleIn(){
         this.open = true;
-        this.productList = this.logList;
+        let queryData = {
+          purchase_control_id:this.purchaseControlId
+        }
+        getPurchaseControlProductDetail(queryData).then(resp=>{
+          if(resp.code===200){
+            this.productList = resp.data.items;
+          }else{
+            this.msgError(resp.msg)
+          }
+        })
       },
       cancel(){
         this.open = false;
@@ -210,11 +256,24 @@
             tempList.push({...item})
           }
         });
-        tempList.push({id:row.id,inQty:row.inQty});
+        tempList.push({id:row.id,quantity:row.inQty});
         this.inList = tempList;
       },
       submitForm(){
-
+        let submitData = {
+          purchase_control_id : this.purchaseControlId,
+          warehouse_detail:this.inList
+        }
+        wareHouse(submitData).then(resp=>{
+          this.cancel();
+          if(resp.code===200){
+            this.msgSuccess("入库成功");
+            this.getOrderInfo();
+            this.getProductPage();
+          }else{
+            this.msgError(resp.msg)
+          }
+        })
       },
     }
   }

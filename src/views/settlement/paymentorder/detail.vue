@@ -150,7 +150,7 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(()=>{
-          updateStatus(this.purchaseControlId,{requests_status:6}).then(response=>{
+          updateStatus(this.purchaseControlId,{purchase_status:6}).then(response=>{
             if (response.code === 200) {
               this.msgSuccess('操作成功');
               this.getOrderInfo()
