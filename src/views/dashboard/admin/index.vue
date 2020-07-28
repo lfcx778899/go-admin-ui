@@ -1,40 +1,40 @@
 <template>
   <div class="dashboard-editor-container">
-    <github-corner class="github-corner" />
+    <!--<github-corner class="github-corner" />-->
 
     <panel-group @handleSetLineChartData="handleSetLineChartData" />
 
-    <el-row :gutter="32">
-      <el-col :xs="24" :sm="24" :lg="12">
-        <el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <span>最新动态</span>
+    <!--<el-row :gutter="32">-->
+      <!--<el-col :xs="24" :sm="24" :lg="12">-->
+        <!--<el-card class="box-card">-->
+          <!--<div slot="header" class="clearfix">-->
+            <!--<span>最新动态</span>-->
 
-          </div>
-          <el-timeline>
-            <el-timeline-item timestamp="2020/05/15" placement="top">
-              <el-card>
-                <h4>更新角色授权数据绑定</h4>
-              </el-card>
-            </el-timeline-item>
-            <el-timeline-item timestamp="2020/05/14" placement="top">
-              <el-card>
-                <h4>角色名称和角色key控制唯一性；</h4>
-                <h4>以及字典，参数等功能唯一性控制；</h4>
-                <h4>记录总条数过滤已删除状态；</h4>
-                <h4>部分已知bug的修复；</h4>
-              </el-card>
-            </el-timeline-item>
-            <el-timeline-item timestamp="2020/4/2" placement="top">
-              <el-card>
-                <p>...</p>
-              </el-card>
-            </el-timeline-item>
-          </el-timeline>
-        </el-card>
+          <!--</div>-->
+          <!--<el-timeline>-->
+            <!--<el-timeline-item timestamp="2020/05/15" placement="top">-->
+              <!--<el-card>-->
+                <!--<h4>更新角色授权数据绑定</h4>-->
+              <!--</el-card>-->
+            <!--</el-timeline-item>-->
+            <!--<el-timeline-item timestamp="2020/05/14" placement="top">-->
+              <!--<el-card>-->
+                <!--<h4>角色名称和角色key控制唯一性；</h4>-->
+                <!--<h4>以及字典，参数等功能唯一性控制；</h4>-->
+                <!--<h4>记录总条数过滤已删除状态；</h4>-->
+                <!--<h4>部分已知bug的修复；</h4>-->
+              <!--</el-card>-->
+            <!--</el-timeline-item>-->
+            <!--<el-timeline-item timestamp="2020/4/2" placement="top">-->
+              <!--<el-card>-->
+                <!--<p>...</p>-->
+              <!--</el-card>-->
+            <!--</el-timeline-item>-->
+          <!--</el-timeline>-->
+        <!--</el-card>-->
 
-      </el-col>
-    </el-row>
+      <!--</el-col>-->
+    <!--</el-row>-->
   </div>
 </template>
 
