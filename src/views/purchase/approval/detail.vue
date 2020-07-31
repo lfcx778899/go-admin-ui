@@ -65,10 +65,10 @@
           <span>{{parseTime(scope.row.created_at)}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="部门名称" prop="dept_name" width="150" />
-      <el-table-column label="操作人" prop="created_by_name" width="150" />
-      <el-table-column label="操作步骤" prop="remark" width="250" />
-      <el-table-column label="处理状态" prop="statusName" width="100" />
+      <el-table-column label="部门名称" prop="dept_name"/>
+      <el-table-column label="操作人" prop="created_by_name"/>
+      <el-table-column label="操作步骤" prop="remark"/>
+      <el-table-column label="处理状态" prop="statusName"/>
     </el-table>
     <pagination
       v-show="total>0"
