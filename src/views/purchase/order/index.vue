@@ -208,7 +208,11 @@ export default {
     /** 重置按钮操作 */
     resetQuery() {
       this.dateRange = []
-      this.resetForm('queryForm')
+      this.queryParams = {
+        purchase_status:'1,2',
+          pageIndex: 1,
+          pageSize: 10,
+      }
       this.handleQuery()
     },
     /** 新增按钮操作 */

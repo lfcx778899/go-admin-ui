@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="100px">
       <el-form-item label="产品类别">
         <el-select
           v-model="queryParams.product_type"
@@ -18,14 +18,30 @@
         </el-select>
       </el-form-item>
       <el-form-item label="产品名称">
-        <el-input
+        <el-select
           v-model="queryParams.product_name"
-          placeholder="请输入产品名称"
+          placeholder="产品名称"
           clearable
           size="small"
           style="width: 240px"
-        />
+        >
+          <el-option
+            v-for="product in selectProductList"
+            :key="product.id"
+            :label="product.product_name"
+            :value="product.product_name"
+          />
+        </el-select>
       </el-form-item>
+      <!--<el-form-item label="产品名称">-->
+        <!--<el-input-->
+          <!--v-model="queryParams.product_name"-->
+          <!--placeholder="请输入产品名称"-->
+          <!--clearable-->
+          <!--size="small"-->
+          <!--style="width: 240px"-->
+        <!--/>-->
+      <!--</el-form-item>-->
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -104,6 +120,7 @@
 <script>
   import { getControlPage } from '@/api/inventory/control'
   import { getDicts } from '@/api/system/dict/data'
+  import { getAll } from '@/api/basic/product'
   export default {
     name: 'Index',
     data() {
@@ -134,17 +151,21 @@
         // 表单校验
         rules: {},
         productTypeList:[],
-
+        productList:[],
+        selectProductList:[],
       }
     },
     created() {
       getDicts('goods_type').then(response => {
         this.productTypeList = response.data
       })
+      getAll().then(response => {
+        this.productList = response.data.items
+        this.selectProductList = this.productList
+      })
       this.getList()
     },
     methods: {
-      /** 查询【请填写功能名称】列表 */
       getList() {
         this.loading = true
         getControlPage(this.queryParams).then(response => {
@@ -153,12 +174,16 @@
           this.loading = false
         })
       },
-      // 取消按钮
+      changeProductName() {
+        this.selectProductList = this.productList.filter(item => {
+          return item.product_type === this.queryParams.product_type
+        })
+        this.queryParams.product_name = ''
+      },
       cancel() {
         this.open = false
         this.reset()
       },
-      // 表单重置
       reset() {
         this.form = {
           id: undefined,
@@ -174,29 +199,27 @@
         }
         this.resetForm('form')
       },
-      /** 搜索按钮操作 */
       handleQuery() {
         this.queryParams.pageIndex = 1
         this.getList()
       },
-      /** 重置按钮操作 */
       resetQuery() {
-        this.resetForm('queryForm')
+        this.queryParams = {
+          pageIndex: 1,
+            pageSize: 10
+        }
         this.handleQuery()
       },
-      // 多选框选中数据
       handleSelectionChange(selection) {
         this.ids = selection.map(item => item.id)
         this.single = selection.length != 1
         this.multiple = !selection.length
       },
-      /** 新增按钮操作 */
       handleAdd() {
         this.reset()
         this.open = true
         this.title = '添加库存记录'
       },
-      /** 修改按钮操作 */
       handleUpdate(row) {
         this.reset()
         const id = row.id || this.ids
@@ -206,7 +229,6 @@
           this.title = '修改【请填写功能名称】'
         })
       },
-      /** 提交按钮 */
       submitForm: function() {
         this.$refs['form'].validate(valid => {
           if (valid) {

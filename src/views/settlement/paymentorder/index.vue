@@ -213,7 +213,11 @@
       /** 重置按钮操作 */
       resetQuery() {
         this.dateRange = []
-        this.resetForm('queryForm')
+        this.queryParams = {
+          purchase_status:'3,4,5,6',
+            pageIndex: 1,
+            pageSize: 10,
+        };
         this.handleQuery()
       },
       /** 新增按钮操作 */
