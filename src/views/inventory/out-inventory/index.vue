@@ -121,6 +121,7 @@
   import { getPage, updateStatus, updateItem, deleteItem, createOut } from '@/api/inventory/out'
   import { getDicts } from '@/api/system/dict/data'
   import { getAll } from '@/api/basic/product'
+  import {getAll as getAllLocation} from '@/api/basic/location';
 export default {
   name: 'Index',
   components: { Treeselect },
@@ -161,6 +162,7 @@ export default {
       productList:[],
       selectProductList:[],
       rejectId:'',
+      locationList:[],
     };
   },
   created() {
@@ -174,6 +176,9 @@ export default {
     getAll().then(response => {
       this.productList = response.data.items
       this.selectProductList = this.productList
+    })
+    getAllLocation().then(response=>{
+      this.locationList = response.data.items;
     })
     this.getList();
   },

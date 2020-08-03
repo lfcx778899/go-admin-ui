@@ -48,24 +48,24 @@
       </el-form-item>
     </el-form>
 
-    <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
-        <el-button
-          type="primary"
-          icon="el-icon-plus"
-          size="mini"
-          @click="handleAdd"
-        >新增
-        </el-button>
-      </el-col>
-    </el-row>
+    <!--<el-row :gutter="10" class="mb8">-->
+      <!--<el-col :span="1.5">-->
+        <!--<el-button-->
+          <!--type="primary"-->
+          <!--icon="el-icon-plus"-->
+          <!--size="mini"-->
+          <!--@click="handleAdd"-->
+        <!--&gt;新增-->
+        <!--</el-button>-->
+      <!--</el-col>-->
+    <!--</el-row>-->
 
     <el-table v-loading="loading" :data="controlList">
       <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="产品类别" align="center" prop="product_type"/>
       <el-table-column label="产品名称" align="center" prop="product_name"/>
-      <el-table-column label="库存数量" align="center" prop="safetyInventory"/>
-      <el-table-column label="预警数量" align="center" prop="storageLocation"/>
+      <el-table-column label="库存数量" align="center" prop="inventory_quantity"/>
+      <el-table-column label="预警数量" align="center" prop="safety_inventory"/>
       <el-table-column label="存储位置" align="center" prop="remark"/>
       <!--<el-table-column label="操作" align="center" class-name="small-padding fixed-width">-->
       <!--<template slot-scope="scope">-->

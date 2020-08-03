@@ -62,14 +62,14 @@
           @click="handleIn"
         >入库</el-button>
       </el-col>
-      <el-col :span="1.5">
-        <el-button v-if="purchaseControlOrder.totalpruchase_quantity>purchaseControlOrder.storaged_total_quantity"
-          type="primary"
-          icon="el-icon-d-arrow-right"
-          size="mini"
-          @click="handleAllIn"
-        >全部入库</el-button>
-      </el-col>
+      <!--<el-col :span="1.5">-->
+        <!--<el-button v-if="purchaseControlOrder.totalpruchase_quantity>purchaseControlOrder.storaged_total_quantity"-->
+          <!--type="primary"-->
+          <!--icon="el-icon-d-arrow-right"-->
+          <!--size="mini"-->
+          <!--@click="handleAllIn"-->
+        <!--&gt;全部入库</el-button>-->
+      <!--</el-col>-->
     </el-row>
     <el-table v-loading="loading" :data="logList">
       <el-table-column label="类型名称" prop="product_type" width="150" />
@@ -111,6 +111,23 @@
     />
 
     <el-dialog title="入库" :visible.sync="open" width="800px">
+      <el-form>
+        <el-form-item label="库位" width="150" >
+          <el-select
+            v-model="warehouse_id"
+            placeholder="库位"
+            clearable
+            style="width: 360px"
+          >
+            <el-option
+              v-for="dict in locationList"
+              :key="dict.id"
+              :label="dict.location_name"
+              :value="dict.id"
+            />
+          </el-select>
+        </el-form-item>
+      </el-form>
       <el-table :data="productList">
         <el-table-column label="类型名称" prop="product_type" width="150" />
         <el-table-column label="商品名称" prop="product_name" width="150" />
@@ -136,7 +153,8 @@
 <script>
   import { getPurchaseControlItem ,getPurchaseControlProduct,uploadContract,updateStatus,wareHouse,wareHouseAll,getPurchaseControlProductDetail} from '@/api/purchase/purchaseControl'
   import {downLoadZip} from "@/utils/zipdownload";
-  import {getInLogPage} from '@/api/purchase/log'
+  import {getInLogPage} from '@/api/purchase/log';
+  import {getAll} from '@/api/basic/location';
   export default {
     name: 'detail',
     data(){
@@ -161,6 +179,8 @@
         },
         inTotal:0,
         inLogList:[],
+        locationList:[],
+        warehouse_id:'',
       }
     },
     mounted(){
@@ -170,12 +190,18 @@
       this.getOrderInfo();
       this.getProductPage();
       this.getInPage();
+      this.getAllLocation();
     },
     methods:{
       getOrderInfo(){
         getPurchaseControlItem({purchase_control_id:this.purchaseControlId}).then(response=>{
           this.purchaseControlOrder = response.data;
         });
+      },
+      getAllLocation(){
+        getAll().then(response=>{
+          this.locationList = response.data.items;
+        })
       },
       getStatusName(statusId){
         if(statusId ===1){
@@ -260,9 +286,14 @@
         this.inList = tempList;
       },
       submitForm(){
+        if(!this.warehouse_id){
+          this.msgError("请选择库位");
+          return false;
+        }
         let submitData = {
           purchase_control_id : this.purchaseControlId,
-          warehouse_detail:this.inList
+          warehouse_detail:this.inList,
+          warehouse_id:this.warehouse_id,
         }
         wareHouse(submitData).then(resp=>{
           this.cancel();
