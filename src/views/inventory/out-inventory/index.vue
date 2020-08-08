@@ -32,6 +32,7 @@
           v-model="queryParams.product_name"
           placeholder="产品名称"
           clearable
+          filterable
           size="small"
           style="width: 240px"
         >

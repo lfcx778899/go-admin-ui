@@ -90,7 +90,7 @@
     />
 
     <!-- 添加或修改对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px">
+    <el-dialog :title="title" :visible.sync="open" width="500px" :close-on-click-modal="false">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="产品类别" prop="product_type">
           <el-select

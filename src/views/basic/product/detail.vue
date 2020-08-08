@@ -90,7 +90,11 @@
       <el-table-column label="供应商名称" prop="supplier_name" width="300" />
       <el-table-column label="产品价格" prop="product_price_withouttax" width="150" />
       <el-table-column label="价格单位" prop="price_unit" width="250" />
-      <el-table-column label="税率" prop="tax_rate" width="100" />
+      <el-table-column label="税率" prop="tax_rate" width="100" >
+        <template slot-scope="scope">
+          <span>{{scope.row.tax_rate*100}}%</span>
+        </template>
+      </el-table-column>
       <el-table-column label="是否默认" prop="is_default" width="120" >
         <template slot-scope="scope">
           <span>{{scope.row.is_default===0?"否":"是"}}</span>

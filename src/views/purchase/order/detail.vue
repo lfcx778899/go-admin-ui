@@ -88,7 +88,7 @@
         <el-col :span="1.5">
           <el-button v-if="purchaseControlOrder.purchase_status===2 && !purchaseControlOrder.contract_adress"
                      type="success"
-                     icon="el-icon-close"
+                     icon="el-icon-upload"
                      size="mini"
                      @click="handleSingleAudit"
           >补充合同</el-button>

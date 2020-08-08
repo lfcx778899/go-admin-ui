@@ -91,6 +91,7 @@
       <el-table-column label="产品名称" prop="product_name"  width="120"/>
       <el-table-column label="申请数量" prop="requests_quantity" width="120"/>
       <el-table-column label="供应商" prop="supplier_names"/>
+      <el-table-column label="价格" prop="supplier_names"/>
       <el-table-column label="状态" prop="requests_status" width="120">
         <template slot-scope="scope">
           <span>{{scope.row.statusName}}</span>
@@ -174,7 +175,7 @@
         productTypeList: [],
         // 查询参数
         queryParams: {
-          requests_statuss: '3,4,5,6',
+          requests_statuss: '3,5,6',
           pageIndex: 1,
           pageSize: 10
         },
@@ -256,7 +257,7 @@
       },
       resetQuery() {
         this.queryParams = {
-          requests_statuss: '3,4,5,6',
+          requests_statuss: '3,5,6',
           pageIndex: 1,
           pageSize: 10
         }

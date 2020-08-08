@@ -40,6 +40,7 @@
             v-model="queryParams.product_name"
             placeholder="产品名称"
             clearable
+            filterable
             size="small"
             style="width: 240px"
           >
@@ -141,6 +142,7 @@
             v-model="form.product_id"
             placeholder="请选择产品"
             clearable
+            filterable
             size="small"
             style="width: 360px"
           >

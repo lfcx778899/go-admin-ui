@@ -104,7 +104,7 @@
       @pagination="getListData"
     />
 
-    <el-dialog :title="title" :visible.sync="open" width="500px">
+    <el-dialog :title="title" :visible.sync="open" width="500px" :close-on-click-modal="false">
       <el-form ref="form" :model="form" :rules="rules" label-width="120px">
         <el-form-item label="供应商名称" prop="supplier_name">
           <el-input v-model="form.supplier_name" placeholder="请输入供应商名称" />
@@ -115,7 +115,7 @@
         <el-form-item label="联系人姓名" prop="contact_name">
           <el-input v-model="form.contact_name" placeholder="请输入联系人姓名" />
         </el-form-item>
-        <el-form-item label="联系人手机" prop="contact_phone">
+        <el-form-item label="联系人电话" prop="contact_phone">
           <el-input v-model="form.contact_phone" placeholder="请输入联系人手机" />
         </el-form-item>
         <el-form-item label="联系人QQ" prop="contact_qq">
@@ -154,9 +154,9 @@ export default {
         supplier_name: [{ required: true, message: '供应商名称不能为空', trigger: 'blur' }],
         supplier_adress: [{ required: true, message: '供应商地址不能为空', trigger: 'blur' }],
         contact_name: [{ required: true, message: '联系人姓名不能为空', trigger: 'blur' }],
-        contact_phone: [{ required: true, message: '联系人手机不能为空', trigger: 'blur' }],
-        contact_qq: [{ required: true, message: '联系人QQ不能为空', trigger: 'blur' }],
-        contact_email: [{ required: true, message: '联系人邮箱不能为空', trigger: 'blur' }]
+        // contact_phone: [{ required: true, message: '联系人手机不能为空', trigger: 'blur' }],
+        // contact_qq: [{ required: true, message: '联系人QQ不能为空', trigger: 'blur' }],
+        // contact_email: [{ required: true, message: '联系人邮箱不能为空', trigger: 'blur' }]
       },
       title: '',
       open: false,

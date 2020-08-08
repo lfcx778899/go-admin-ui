@@ -47,13 +47,13 @@
     </el-form>
 
     <el-table v-loading="loading" :data="purchasecontrolList">
-      <el-table-column label="采购单号" prop="purchase_control_id"/>
+      <el-table-column label="采购单号" prop="purchase_control_id" width="220"/>
       <el-table-column label="采购时间" prop="created_at" width="200">
         <template slot-scope="scope">
           <span>{{parseTime(scope.row.created_at)}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="供应商" prop="supplier_name" width="120"/>
+      <el-table-column label="供应商" prop="supplier_name" />
       <el-table-column label="采购数量" prop="totalpruchase_quantity" width="120"/>
       <el-table-column label="采购金额" prop="totalamount_without_tax" width="120"/>
       <el-table-column label="状态" prop="purchase_status" width="120">
