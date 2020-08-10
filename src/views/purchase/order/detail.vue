@@ -96,7 +96,7 @@
       </el-row>
     </div>
 
-    <el-dialog title="上传合同" :visible.sync="open" width="500px">
+    <el-dialog title="上传合同" :visible.sync="open" width="500px" :close-on-click-modal="false">
       <el-form ref="form" label-width="100px">
         <el-form-item label="上传合同" prop="remark">
           <el-upload

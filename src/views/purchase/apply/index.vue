@@ -135,7 +135,7 @@
     />
 
     <!-- 添加或修改对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px">
+    <el-dialog :title="title" :visible.sync="open" width="500px" :close-on-click-modal="false">
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="产品名称" prop="product_id"  >
           <el-select
@@ -216,7 +216,9 @@ export default {
       form: {
       },
       // 表单校验
-      rules: {},
+      rules: {
+        product_id:[{ required: true, message: '产品名称不能为空', trigger: 'blur' }],
+      },
       selectRows:[],
     }
   },

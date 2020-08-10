@@ -70,7 +70,7 @@
     />
 
 
-    <el-dialog :title="title" :visible.sync="open" width="500px">
+    <el-dialog :title="title" :visible.sync="open" width="500px" :close-on-click-modal="false">
       <el-form ref="form" label-width="100px">
         <el-form-item label="选择文件" prop="remark">
           <el-upload

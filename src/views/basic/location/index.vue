@@ -60,7 +60,7 @@
     />
 
     <!-- 添加或修改【请填写功能名称】对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="500px" :close-on-click-modal="false">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="库位简称" prop="location_name">
           <el-input :disabled="ifEdit" v-model="form.location_name" placeholder="请输入库位简称" />
@@ -111,7 +111,9 @@
         // 表单参数
         form: {},
         // 表单校验
-        rules: {},
+        rules: {
+          location_name:[{ required: true, message: '库位简称不能为空', trigger: 'blur' }],
+        },
         ifEdit:false,
       };
     },

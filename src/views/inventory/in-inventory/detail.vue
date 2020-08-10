@@ -110,7 +110,7 @@
       @pagination="getInPage"
     />
 
-    <el-dialog title="入库" :visible.sync="open" width="800px">
+    <el-dialog title="入库" :visible.sync="open" width="800px" :close-on-click-modal="false">
       <el-form>
         <el-form-item label="库位" width="150" >
           <el-select

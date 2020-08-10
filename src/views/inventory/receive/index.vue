@@ -132,7 +132,7 @@
     />
 
     <!-- 添加或修改【请填写功能名称】对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body :close-on-click-modal="false">
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="产品类别">
           <el-select
@@ -157,6 +157,7 @@
             v-model="form.product_id"
             placeholder="请选择产品"
             clearable
+            filterable
             size="small"
             style="width: 360px"
             :disabled="ifEdit"
@@ -223,7 +224,9 @@
           product_type:'',
         },
         // 表单校验
-        rules: {},
+        rules: {
+          product_id:[{ required: true, message: '产品名称不能为空', trigger: 'blur' }],
+        },
         selectProductList: [],
         productTypeList: [],
         orderStatusList: [],
