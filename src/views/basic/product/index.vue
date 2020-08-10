@@ -199,8 +199,9 @@ export default {
     },
     // 取消按钮
     cancel() {
-      this.open = false
-      this.reset()
+      this.open = false;
+      this.form = {};
+      // this.reset()
     },
     // 表单重置
     reset() {

@@ -259,7 +259,7 @@
       // 取消按钮
       cancel() {
         this.open = false
-        this.reset()
+        this.form = {}
       },
       changeProductName() {
         this.selectProductList = this.productList.filter(item => {

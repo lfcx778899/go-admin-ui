@@ -218,7 +218,8 @@ export default {
     },
     cancel() {
       this.open = false
-      this.reset()
+      this.form={};
+      // this.reset()
     },
     reset() {
       this.form = {

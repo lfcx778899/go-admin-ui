@@ -10,7 +10,7 @@
           style="width: 240px"
         >
           <el-option
-            v-for="dict in statusList"
+            v-for="dict in orderStatusList"
             :key="dict.dictValue"
             :label="dict.dictLabel"
             :value="dict.dictValue"
@@ -268,7 +268,7 @@ export default {
     // 取消按钮
     cancel() {
       this.open = false
-      this.reset()
+      this.form = {}
     },
     changeProductName(){
       this.selectProductList = this.productList.filter(item=>{

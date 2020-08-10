@@ -134,7 +134,7 @@
       cancel() {
         this.open = false;
         this.ifEdit = false;
-        this.reset();
+        this.form = {};
       },
       // 表单重置
       reset() {

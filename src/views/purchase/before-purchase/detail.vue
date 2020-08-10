@@ -129,7 +129,7 @@
           style="width: 360px"
         >
           <el-option
-            v-for="product in suppliers"
+            v-for="product in ProductSuppliers"
             :key="product.id"
             :label="product.supplier_name"
             :value="product.supplier_id"
