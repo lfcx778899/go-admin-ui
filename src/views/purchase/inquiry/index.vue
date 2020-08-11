@@ -44,7 +44,7 @@
           <el-button v-if="scope.row.quotation_status===0"
             size="small"
             type="success"
-            icon="el-icon-view"
+            icon="el-icon-upload2"
             @click="handleUpLoad(scope.row)"
           >上传</el-button>
           <el-button v-else

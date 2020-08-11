@@ -45,3 +45,18 @@ export function getInUseSupplier(){
     method: 'get',
   })
 }
+
+export function uploadSupplier(data) {
+  return request({
+    url: '/api/supplier/upload',
+    method: 'post',
+    data: data
+  })
+}
+
+export function exportSupplier() {
+  return request({
+    url: '/api/supplier/download',
+    method: 'post',
+  })
+}
