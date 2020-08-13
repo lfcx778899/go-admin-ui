@@ -193,6 +193,19 @@
   export default {
     name: 'Index',
     data() {
+      const checkQuantity = (rule, value, callback) => {
+        setTimeout(() => {
+          if (!Number.isInteger(value)) {
+            callback(new Error('请输入数字值'));
+          } else {
+            if (value <= 0) {
+              callback(new Error('申请数量不能小于或等于0'));
+            } else {
+              callback();
+            }
+          }
+        }, 1000);
+      };
       return {
         // 遮罩层
         loading: true,
@@ -226,6 +239,7 @@
         // 表单校验
         rules: {
           product_id:[{ required: true, message: '产品名称不能为空', trigger: 'blur' }],
+          requests_quantity:[{validator: checkQuantity, trigger: 'blur'}],
         },
         selectProductList: [],
         productTypeList: [],
