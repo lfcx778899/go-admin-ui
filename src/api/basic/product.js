@@ -46,3 +46,18 @@ export function getAll() {
     method: 'get',
   })
 }
+
+export function uploadProduct(data) {
+  return request({
+    url: '/api/product/upload',
+    method: 'post',
+    data: data
+  })
+}
+
+export function exportProduct() {
+  return request({
+    url: '/api/product/download',
+    method: 'post',
+  })
+}

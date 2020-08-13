@@ -88,16 +88,19 @@
       </el-table-column>
       <el-table-column label="部门名称" prop="dept_name" width="120"/>
       <el-table-column label="产品类别" prop="product_type"  width="120"/>
-      <el-table-column label="产品名称" prop="product_name"  width="120"/>
-      <el-table-column label="申请数量" prop="requests_quantity" width="120"/>
-      <el-table-column label="供应商" prop="supplier_names"/>
-      <el-table-column label="价格" prop="supplier_names"/>
+      <el-table-column label="产品名称" prop="product_name"  width="200"/>
+      <el-table-column label="申请数量" prop="requests_quantity" width="100"/>
+      <el-table-column label="供应商" prop="supplier_names" width="200"/>
       <el-table-column label="状态" prop="requests_status" width="120">
         <template slot-scope="scope">
           <span>{{scope.row.statusName}}</span>
         </template>
       </el-table-column>
       <el-table-column label="库存数量" prop="inventory_quantity" width="120"/>
+      <el-table-column label="规格" prop="product_specifications" width="150"/>
+      <el-table-column label="单位" prop="product_units"  width="150"/>
+      <el-table-column label="价格" prop="product_price_withouttax"  width="150"/>
+      <el-table-column label="备注" prop="remark"/>
       <el-table-column label="操作" align="left" class-name="small-padding fixed-width" width="360">
         <template slot-scope="scope">
           <el-button v-if="scope.row.requests_status===3"

@@ -1,6 +1,22 @@
 <template>
   <div class="app-container">
     <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="100px">
+      <el-form-item label="状态">
+        <el-select
+          v-model="queryParams.requests_status"
+          placeholder="状态"
+          clearable
+          size="small"
+          style="width: 240px"
+        >
+          <el-option
+            v-for="dict in orderStatusList"
+            :key="dict.dictValue"
+            :label="dict.dictLabel"
+            :value="dict.dictValue"
+          />
+        </el-select>
+      </el-form-item>
       <el-form-item label="归属部门" prop="deptId">
         <treeselect
           v-model="queryParams.dept_id"
@@ -71,6 +87,9 @@
       <el-table-column label="产品类别" prop="product_type"/>
       <el-table-column label="产品名称" prop="product_name"/>
       <el-table-column label="申请数量" prop="requests_quantity"/>
+      <el-table-column label="规格" prop="product_specifications" width="150"/>
+      <el-table-column label="单位" prop="product_units"  width="150"/>
+      <el-table-column label="备注" prop="remark"/>
       <el-table-column label="操作" align="left" class-name="small-padding fixed-width" width="360">
         <template slot-scope="scope">
           <el-button v-if="scope.row.requests_status===2"
@@ -146,7 +165,11 @@ export default {
         pageSize: 10,
       },
       statusList:[],
-      orderStatusList:[],
+      orderStatusList:[
+        {dictLabel: "已提交", dictValue: "2"},
+        {dictLabel: "已审批", dictValue: "3"},
+        {dictLabel: "取消采购", dictValue: "4"}
+  ],
       rules: {},
       selectRows:[],
       deptOptions: undefined,
@@ -161,9 +184,9 @@ export default {
       this.productList = response.data.items;
       this.selectProductList = this.productList;
     });
-    getDicts('purchase_status').then(response => {
-      this.orderStatusList = response.data
-    })
+    // getDicts('purchase_status').then(response => {
+    //   this.orderStatusList = response.data
+    // })
     this.getList();
   },
   methods:{
@@ -196,6 +219,11 @@ export default {
     },
     getList(){
       this.loading = true
+      if(this.queryParams.requests_status){
+        this.queryParams.requests_statuss=this.queryParams.requests_status;
+      }else{
+        this.queryParams.requests_statuss='2,3,4';
+      }
       getApprovals(this.queryParams).then(response => {
           let tempList =[];
           if(response.data&&response.data.items&&response.data.items.length>0){

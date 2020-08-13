@@ -79,6 +79,9 @@
       <el-table-column label="总金额" prop="amount_without_tax"/>
       <el-table-column label="已入库数量" prop="storaged_quantity" width="150" />
       <el-table-column label="已入库金额" prop="storaged_amount_without_tax"/>
+      <el-table-column label="规格" prop="product_specifications" width="150"/>
+      <el-table-column label="单位" prop="product_units"  width="150"/>
+      <el-table-column label="备注" prop="remark"/>
     </el-table>
     <pagination
       v-show="total>0"
@@ -301,6 +304,7 @@
             this.msgSuccess("入库成功");
             this.getOrderInfo();
             this.getProductPage();
+            this.getInPage();
           }else{
             this.msgError(resp.msg)
           }

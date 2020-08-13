@@ -42,6 +42,24 @@
           @click="handleAdd"
         >新增</el-button>
       </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="success"
+          icon="el-icon-upload2"
+          size="mini"
+          @click="handleUpload"
+        >上传
+        </el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="success"
+          icon="el-icon-download"
+          size="mini"
+          @click="handleExport"
+        >下载
+        </el-button>
+      </el-col>
     </el-row>
 
     <el-table v-loading="loading" :data="productList" @selection-change="handleSelectionChange">
@@ -144,12 +162,36 @@
       </div>
     </el-dialog>
 
+    <el-dialog title="选择文件" :visible.sync="showUpload" width="500px" :close-on-click-modal="false">
+      <el-form ref="form" label-width="100px">
+        <el-form-item label="选择文件" prop="remark">
+          <el-upload
+            :limit=1
+            :auto-upload="false"
+            accept=".xlsx"
+            :action="UploadUrl()"
+            :before-upload="beforeUploadFile"
+            :on-change="fileChange"
+            :on-exceed="exceedFile"
+            :on-success="handleSuccess"
+            :on-error="handleError"
+            :file-list="fileList">
+            <el-button size="small" type="primary">点击上传</el-button>
+          </el-upload>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="uploadFile">确 定</el-button>
+        <el-button @click="cancelUpload">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { getProductPage, create, deleteProduct, updateProduct, getProduct } from '@/api/basic/product'
+import { getProductPage, create, deleteProduct, updateProduct, getProduct ,uploadProduct,exportProduct} from '@/api/basic/product'
 import { getDicts } from '@/api/system/dict/data'
+import {downLoadXls} from '@/utils/zipdownload'
 export default {
   name: 'Index',
   data() {
@@ -174,6 +216,8 @@ export default {
       },
       productList:[],
       total:0,
+      fileList:[],
+      showUpload:false,
     }
   },
   created() {
@@ -191,6 +235,68 @@ export default {
         this.productList = resp.data.items;
         this.total = resp.data.total;
         this.loading = false
+      })
+    },
+    handleUpload(){
+      this.showUpload = true;
+    },
+    cancelUpload(){
+      this.fileList =[];
+      this.showUpload = false;
+    },
+    UploadUrl(){
+      return "";
+    },
+    uploadFile() {
+      if (this.fileList.length === 0){
+        this.msgError("请上传文件");
+      } else {
+        let form = new FormData();
+        form.append('file', this.fileList[0]);
+
+        uploadProduct(form).then(resp=>{
+          if (resp.code === 200) {
+            this.msgSuccess('操作成功')
+            this.cancelUpload();
+            this.getList()
+          } else {
+            this.msgError(resp.msg)
+          }
+        })
+      }
+    },
+    exceedFile(files, fileList) {
+      this.msgError("选择多个文件");
+    },
+    fileChange(file, fileList) {
+      this.fileList.push(file.raw) ;
+    },
+    beforeUploadFile(file) {
+      let extension = file.name.substring(file.name.lastIndexOf('.')+1);
+      let size = file.size / 1024 / 1024;
+      if(extension !== 'xlsx') {
+        this.msgError("只能上传后缀是.xlsx的文件");
+      }
+      if(size > 4) {
+        this.msgError("文件大小不得超过4M");
+      }
+    },
+    // 文件上传成功时的钩子
+    handleSuccess(res, file, fileList) {
+      this.msgSuccess('文件上传成功')
+    },
+    // 文件上传失败时的钩子
+    handleError(err, file, fileList) {
+      this.msgError("文件上传失败");
+    },
+    handleExport(){
+      exportProduct().then(resp=>{
+        if (resp.code === 200) {
+          let exportPath = resp.data.file_path;
+          downLoadXls(exportPath);
+        } else {
+          this.msgError(resp.msg)
+        }
       })
     },
     refreshQuery() {

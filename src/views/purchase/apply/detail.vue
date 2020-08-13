@@ -54,6 +54,21 @@
             <span>{{purchaseOrder.requests_quantity}}</span>
           </el-form-item>
         </el-col>
+        <el-col :span="6">
+          <el-form-item label="规格">
+            <span>{{purchaseOrder.product_specifications}}</span>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label="单位">
+            <span>{{purchaseOrder.product_units}}</span>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label="备注">
+            <span>{{purchaseOrder.remark}}</span>
+          </el-form-item>
+        </el-col>
       </el-row>
     </el-form>
     <div class="detail-title">
