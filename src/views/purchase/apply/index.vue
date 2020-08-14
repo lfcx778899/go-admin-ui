@@ -285,6 +285,7 @@ export default {
     cancel() {
       this.open = false
       this.form = {}
+      this.handleQuery();
     },
     changeProductName(){
       this.selectProductList = this.productList.filter(item=>{
@@ -398,8 +399,7 @@ export default {
             updateItem(this.form.id,{...this.form,product_id:String(this.form.product_id)}).then(response => {
               if (response.code === 200) {
                 this.msgSuccess('修改成功')
-                this.open = false
-                this.getList()
+                this.cancel();
               } else {
                 this.msgError(response.msg)
               }
@@ -408,8 +408,7 @@ export default {
             create({...this.form,product_id:String(this.form.product_id)}).then(response => {
               if (response.code === 200) {
                 this.msgSuccess('新增成功')
-                this.open = false
-                this.getList()
+                this.cancel();
               } else {
                 this.msgError(response.msg)
               }

@@ -1,6 +1,22 @@
 <template>
   <div class="app-container">
     <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="100px">
+      <el-form-item label="状态">
+        <el-select
+          v-model="queryParams.requests_status"
+          placeholder="状态"
+          clearable
+          size="small"
+          style="width: 240px"
+        >
+          <el-option
+            v-for="dict in orderStatusList"
+            :key="dict.dictValue"
+            :label="dict.dictLabel"
+            :value="dict.dictValue"
+          />
+        </el-select>
+      </el-form-item>
       <el-form-item label="归属部门" prop="deptId">
         <treeselect
           v-model="queryParams.dept_id"
@@ -57,15 +73,15 @@
         >创建询价单
         </el-button>
       </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="success"
-          icon="el-icon-d-arrow-right"
-          size="small"
-          @click="handleAllCreate"
-        >全部询价
-        </el-button>
-      </el-col>
+      <!--<el-col :span="1.5">-->
+        <!--<el-button-->
+          <!--type="success"-->
+          <!--icon="el-icon-d-arrow-right"-->
+          <!--size="small"-->
+          <!--@click="handleAllCreate"-->
+        <!--&gt;全部询价-->
+        <!--</el-button>-->
+      <!--</el-col>-->
       <el-col :span="1.5">
         <el-button
           type="success"
@@ -101,7 +117,7 @@
       <el-table-column label="单位" prop="product_units"  width="150"/>
       <el-table-column label="价格" prop="product_price_withouttax"  width="150"/>
       <el-table-column label="备注" prop="remark"/>
-      <el-table-column label="操作" align="left" class-name="small-padding fixed-width" width="360">
+      <el-table-column label="操作" align="left" class-name="small-padding fixed-width" width="400">
         <template slot-scope="scope">
           <el-button v-if="scope.row.requests_status===3"
                      size="small"
@@ -110,20 +126,33 @@
                      @click="handleSingleReject(scope.row)"
           >取消采购
           </el-button>
-          <el-button v-if="scope.row.requests_status===3"
+          <el-button v-if="scope.row.requests_status===3 || scope.row.requests_status===5"
                      size="small"
                      type="primary"
                      icon="el-icon-check"
-                     @click="handleCheckSupplier(scope.row)"
+                     @click="handleOneSupplier(scope.row)"
           >确认
           </el-button>
-          <el-button v-if="scope.row.requests_status===3 || scope.row.requests_status===5"
+          <!--<el-button v-if="scope.row.requests_status===3"-->
+                     <!--size="small"-->
+                     <!--type="primary"-->
+                     <!--icon="el-icon-check"-->
+                     <!--@click="handleCheckSupplier(scope.row)"-->
+          <!--&gt;确认-->
+          <!--</el-button>-->
+          <el-button v-if="scope.row.requests_status===3"
                      size="small"
-                     type="success"
-                     icon="el-icon-view"
-                     @click="handleDetail(scope.row)"
-          >修改供应商
+                     type="primary"
+                     icon="el-icon-s-data"
+                     @click="handleMoreSupplier(scope.row)"
+          >比价
           </el-button>
+          <el-button
+            size="small"
+            type="success"
+            icon="el-icon-view"
+            @click="handleDetail(scope.row)"
+          >详情</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -134,6 +163,54 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
+
+    <el-dialog :title="title" :visible.sync="open" width="500px" :close-on-click-modal="false">
+      <el-form ref="form" :model="form" label-width="80px">
+        <el-form-item label="供应商" prop="supplier_id"  v-if="!showPrice">
+          <el-select
+            v-model="form.ids"
+            placeholder="请选择供应商"
+            clearable
+            filterable
+            multiple
+            size="small"
+            style="width: 360px"
+          >
+            <el-option
+              v-for="product in inUseSupplier"
+              :key="product.id"
+              :label="product.supplier_name"
+              :value="product.supplier_id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="供应商" prop="supplier_id"  v-if="showPrice">
+          <el-select
+            v-model="form.supplier_id"
+            placeholder="请选择供应商"
+            clearable
+            filterable
+            size="small"
+            style="width: 360px"
+            @change="changeSupplier"
+          >
+            <el-option
+              v-for="product in checkList"
+              :key="product.id"
+              :label="product.supplier_name"
+              :value="product.supplier_id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="单价" prop="product_id"  v-if="showPrice">
+          <el-input-number :min="0.00" :step="0.01" v-model="form.price" style="width: 360px"/>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
 
   </div>
 </template>
@@ -149,7 +226,7 @@
   import { getInUseSupplier } from '@/api/basic/supplier'
   import { createQuotationControl, createAll } from '@/api/purchase/quotationControl'
   import { createPurchaseControl } from '@/api/purchase/purchaseControl'
-
+  import {updateItem as updateProductPrice,getProductSupplier,create as createProductPrice} from '@/api/basic/productPrice'
   export default {
     name: 'Index',
     components: { Treeselect },
@@ -183,11 +260,21 @@
           pageSize: 10
         },
         statusList: [],
-        orderStatusList: [],
+        orderStatusList: [
+          {dictLabel: "已审批", dictValue: "3"},
+          {dictLabel: "询价中", dictValue: "5"},
+          {dictLabel: "已确认", dictValue: "6"}
+        ],
         rules: {},
         selectRows: [],
         inUseSupplier: [],
-        deptOptions: undefined
+        deptOptions: undefined,
+        showPrice :false,
+        ProductSuppliers:[],
+        checkList:[],
+        form:{
+          ids:[]
+        },
       }
     },
     created() {
@@ -199,9 +286,9 @@
         this.productList = response.data.items
         this.selectProductList = this.productList
       })
-      getDicts('purchase_status').then(response => {
-        this.orderStatusList = response.data
-      })
+      // getDicts('purchase_status').then(response => {
+      //   this.orderStatusList = response.data
+      // })
       getInUseSupplier().then(resp => {
         this.inUseSupplier = resp.data.items
       })
@@ -225,6 +312,119 @@
         this.single = selection.length !== 1
         this.multiple = !selection.length
       },
+      changeSupplier(){
+        this.ProductSuppliers.forEach(supplier=>{
+          if(supplier.supplier_id === this.form.supplier_id){
+            this.form.price = supplier.product_price_withouttax
+          }
+        })
+      },
+      cancel(){
+        this.title = "";
+        this.open = false;
+        this.form = {};
+        this.showPrice = false;
+        this.purchaseRequestId='';
+      },
+      handleOneSupplier(row){
+        this.title = "确认供应商";
+        this.open = true;
+        this.showPrice = true;
+        this.purchaseRequestId = row.id;
+        this.product_id = row.product_id;
+        getProductSupplier({product_id :this.product_id}).then(resp=>{
+          this.ProductSuppliers = resp.data.items;
+        })
+        let tempList =[];
+        this.inUseSupplier.forEach(supplier=>{
+          let selectList = row.supplier_ids.split(',');
+          selectList.forEach(id=>{
+            if(supplier.supplier_id === id){
+              tempList.push(supplier);
+            }
+          })
+        })
+        if(tempList.length>0){
+          this.checkList = tempList;
+        }else{
+          this.checkList = this.inUseSupplier;
+        }
+      },
+      handleMoreSupplier(row){
+        this.title = "选择供应商";
+        this.open = true;
+        this.purchaseRequestId = row.id;
+        if(row.supplier_ids){
+          this.form.ids = row.supplier_ids.split(',');
+        }
+      },
+      submitForm(){
+        //确认供应商
+        if(this.showPrice){
+          let updateData = {
+            supplier_ids: this.form.supplier_id
+          }
+          updateItem(this.purchaseRequestId,updateData).then(response=>{
+            if (response.code === 200) {
+              updateStatus(this.purchaseRequestId,{requests_status:6}).then(resp=>{
+                if (response.code === 200) {
+                  let priceId ='';
+                  this.ProductSuppliers.forEach(supplier=>{
+                    if(supplier.supplier_id === this.form.supplier_id){
+                      priceId = supplier.id;
+                    }
+                  })
+                  if(priceId){
+                    updateProductPrice(priceId,{product_price_withouttax:Number(this.form.price)}).then(r=>{
+                      if (r.code === 200) {
+                        this.msgSuccess('操作成功')
+                        this.cancel()
+                        this.getList()
+                      } else {
+                        this.msgError(r.msg)
+                      }
+                    })
+                  }else{
+                    let createdData={
+                      supplier_id:this.form.supplier_id,
+                      product_id:this.product_id,
+                      product_price_withouttax:Number(this.form.price)
+                    }
+                    createProductPrice(createdData).then(r=>{
+                      if (r.code === 200) {
+                        this.msgSuccess('操作成功')
+                        this.cancel()
+                        this.getList()
+                      } else {
+                        this.msgError(r.msg)
+                      }
+                    })
+                  }
+
+                } else {
+                  this.msgError(resp.msg)
+                }
+              })
+            } else {
+              this.msgError(response.msg)
+            }
+          })
+        }else{
+          //修改供应商
+          let updateData = {
+            supplier_ids: this.form.ids.join(',')
+          }
+          updateItem(this.purchaseRequestId,updateData).then(response=>{
+            if (response.code === 200) {
+              this.msgSuccess('操作成功')
+              this.cancel()
+              this.getList()
+            } else {
+              this.msgError(response.msg)
+            }
+          })
+        }
+      },
       normalizer(node) {
         if (node.children && !node.children.length) {
           delete node.children
@@ -237,6 +437,11 @@
       },
       getList() {
         this.loading = true
+        if(this.queryParams.requests_status){
+          this.queryParams.requests_statuss=this.queryParams.requests_status;
+        }else{
+          this.queryParams.requests_statuss='3,5,6';
+        }
         getApprovals(this.queryParams).then(response => {
             let tempList = []
             if (response.data && response.data.items && response.data.items.length > 0) {

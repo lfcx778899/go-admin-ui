@@ -93,10 +93,10 @@
         <el-col :span="1.5">
           <el-button v-if="purchaseOrder.requests_status===3"
             type="primary"
-            icon="el-icon-check"
+            icon="el-icon-s-data"
             size="mini"
             @click="handleChangeSupplier"
-          >修改供应商</el-button>
+          >比价</el-button>
         </el-col>
         <el-col :span="1.5">
           <el-button v-if="purchaseOrder.requests_status===3 ||purchaseOrder.requests_status===5"
@@ -104,7 +104,7 @@
                      icon="el-icon-check"
                      size="mini"
                      @click="handleCheckSupplier"
-          >确认供应商</el-button>
+          >确认</el-button>
         </el-col>
         <el-col :span="1.5">
           <el-button v-if="purchaseOrder.requests_status===3"
@@ -113,6 +113,15 @@
             size="mini"
             @click="handleSingleReject"
           >取消采购</el-button>
+        </el-col>
+        <el-col :span="1.5">
+          <el-button
+            type="warning"
+            icon="el-icon-s-promotion"
+            size="mini"
+            @click="backToList"
+          >返回列表
+          </el-button>
         </el-col>
       </el-row>
     </div>
@@ -129,7 +138,7 @@
           style="width: 360px"
         >
           <el-option
-            v-for="product in ProductSuppliers"
+            v-for="product in suppliers"
             :key="product.id"
             :label="product.supplier_name"
             :value="product.supplier_id"
@@ -163,8 +172,6 @@
       </div>
     </el-dialog>
 
-
-
   </div>
 </template>
 
@@ -173,7 +180,7 @@
   import { getDicts } from '@/api/system/dict/data'
   import {getPage} from '@/api/purchase/log'
   import {getInUseSupplier} from '@/api/basic/supplier'
-  import {updateItem as updateProductPrice,getProductSupplier} from '@/api/basic/productPrice'
+  import {updateItem as updateProductPrice,getProductSupplier,create as createProductPrice} from '@/api/basic/productPrice'
   export default {
     name: 'detail',
     data(){
@@ -227,6 +234,9 @@
           }
         });
       },
+      backToList(){
+        this.$router.push({path:'/purchase/before-pur'})
+      },
       getProductSuppliers(){
         getProductSupplier({product_id :this.product_id}).then(resp=>{
           this.ProductSuppliers = resp.data.items;
@@ -269,7 +279,7 @@
         this.open = true;
         this.showPrice = true;
         let tempList =[];
-        this.ProductSuppliers.forEach(supplier=>{
+        this.suppliers.forEach(supplier=>{
           let selectList = this.purchaseOrder.supplier_ids.split(',');
           selectList.forEach(id=>{
             if(supplier.supplier_id === id){
@@ -277,7 +287,11 @@
             }
           })
         })
-        this.checkList = tempList;
+        if(tempList.length>0){
+          this.checkList = tempList;
+        }else{
+          this.checkList = this.suppliers;
+        }
       },
       cancel(){
         this.title = "";
@@ -301,15 +315,32 @@
                       priceId = supplier.id;
                     }
                   })
-                  updateProductPrice(priceId,{product_price_withouttax:Number(this.form.price)}).then(r=>{
-                    if (r.code === 200) {
-                      this.msgSuccess('操作成功')
-                      this.cancel()
-                      this.getOrderInfo()
-                    } else {
-                      this.msgError(r.msg)
+                  if(priceId){
+                    updateProductPrice(priceId,{product_price_withouttax:Number(this.form.price)}).then(r=>{
+                      if (r.code === 200) {
+                        this.msgSuccess('操作成功')
+                        this.cancel()
+                        this.getOrderInfo()
+                      } else {
+                        this.msgError(r.msg)
+                      }
+                    })
+                  }else{
+                    let createdData={
+                      supplier_id:this.form.supplier_id,
+                      product_id:this.product_id,
+                      product_price_withouttax:Number(this.form.price)
                     }
-                  })
+                    createProductPrice(createdData).then(r=>{
+                      if (r.code === 200) {
+                        this.msgSuccess('操作成功')
+                        this.cancel()
+                        this.getList()
+                      } else {
+                        this.msgError(r.msg)
+                      }
+                    })
+                  }
                 } else {
                   this.msgError(resp.msg)
                 }

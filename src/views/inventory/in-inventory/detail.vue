@@ -125,7 +125,7 @@
       </el-col>
     </el-row>
 
-    <el-dialog title="入库" :visible.sync="open" width="800px" :close-on-click-modal="false">
+    <el-dialog title="入库" :visible.sync="open" width="850px" :close-on-click-modal="false">
       <el-form>
         <el-form-item label="库位" width="150" >
           <el-select
@@ -152,7 +152,7 @@
         <el-table-column label="已入库数量" prop="storaged_quantity" width="100" />
         <el-table-column label="入库数量" prop="inQty" width="100" >
           <template slot-scope="scope">
-            <el-input-number v-model="scope.row.inQty" controls-position="right" :min="0" :step="1" :max="scope.row.pruchase_quantity" style="width: 100px" @change="changeInQty(scope.row)"/>
+            <el-input-number v-model="scope.row.inQty" controls-position="right" :min="0" :step="1" style="width: 100px" @change="changeInQty(scope.row)"/>
           </template>
         </el-table-column>
       </el-table>
@@ -300,7 +300,7 @@
             tempList.push({...item})
           }
         });
-        tempList.push({id:row.id,quantity:row.inQty});
+        tempList.push({...row,quantity:row.inQty});
         this.inList = tempList;
       },
       submitForm(){
@@ -308,22 +308,53 @@
           this.msgError("请选择库位");
           return false;
         }
+        let overIn = false;
+        if(this.inList.length>0){
+          this.inList.forEach(inItem=>{
+            let pruchase_quantity = inItem.pruchase_quantity || 0;
+            let storaged_quantity = inItem.storaged_quantity ||0;
+            let quantity = inItem.quantity || 0;
+            if(pruchase_quantity-storaged_quantity-quantity<0){
+              overIn = true;
+            }
+          })
+        }
         let submitData = {
           purchase_control_id : this.purchaseControlId,
           warehouse_detail:this.inList,
           warehouse_id:this.warehouse_id,
         }
-        wareHouse(submitData).then(resp=>{
-          this.cancel();
-          if(resp.code===200){
-            this.msgSuccess("入库成功");
-            this.getOrderInfo();
-            this.getProductPage();
-            this.getInPage();
-          }else{
-            this.msgError(resp.msg)
-          }
-        })
+        if(overIn){
+          this.$confirm('检查到有产品超出采购数量，是否确认超量入库?', '警告', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(()=>{
+            wareHouse(submitData).then(resp=>{
+              this.cancel();
+              if(resp.code===200){
+                this.msgSuccess("入库成功");
+                this.getOrderInfo();
+                this.getProductPage();
+                this.getInPage();
+              }else{
+                this.msgError(resp.msg)
+              }
+            })
+          })
+        }else{
+          wareHouse(submitData).then(resp=>{
+            this.cancel();
+            if(resp.code===200){
+              this.msgSuccess("入库成功");
+              this.getOrderInfo();
+              this.getProductPage();
+              this.getInPage();
+            }else{
+              this.msgError(resp.msg)
+            }
+          })
+        }
       },
     }
   }

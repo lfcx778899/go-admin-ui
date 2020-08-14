@@ -258,7 +258,7 @@ export default {
           if (resp.code === 200) {
             this.msgSuccess('操作成功')
             this.cancelUpload();
-            this.getList()
+            this.cancel();
           } else {
             this.msgError(resp.msg)
           }
@@ -307,7 +307,7 @@ export default {
     cancel() {
       this.open = false;
       this.form = {};
-      // this.reset()
+      this.handleQuery();
     },
     // 表单重置
     reset() {
@@ -373,8 +373,7 @@ export default {
             updateProduct(this.form.id,this.form).then(response => {
               if (response.code === 200) {
                 this.msgSuccess('修改成功')
-                this.open = false
-                this.getList()
+                this.cancel();
               } else {
                 this.msgError(response.msg)
               }
@@ -383,8 +382,7 @@ export default {
             create(this.form).then(response => {
               if (response.code === 200) {
                 this.msgSuccess('新增成功')
-                this.open = false
-                this.getList()
+                this.cancel()
               } else {
                 this.msgError(response.msg)
               }

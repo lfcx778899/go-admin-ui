@@ -274,6 +274,7 @@
       cancel() {
         this.open = false
         this.form = {}
+        this.handleQuery();
       },
       changeProductName() {
         this.selectProductList = this.productList.filter(item => {
@@ -401,9 +402,7 @@
               updateItem(this.form.id,updateData).then(response=>{
                 if (response.code === 200) {
                   this.msgSuccess('操作成功')
-                  this.open = false
-                  this.ifEdit = false
-                  this.getList()
+                  this.cancel()
                 } else {
                   this.msgError(response.msg)
                 }
@@ -417,8 +416,7 @@
               createOut(createData).then(response => {
                 if (response.code === 200) {
                   this.msgSuccess('新增成功')
-                  this.open = false
-                  this.getList()
+                  this.cancel()
                 } else {
                   this.msgError(response.msg)
                 }

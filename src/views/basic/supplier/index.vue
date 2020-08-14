@@ -325,6 +325,7 @@ export default {
     cancel() {
       this.open = false
       this.form={};
+      this.handleQuery();
       // this.reset()
     },
     reset() {
@@ -357,19 +358,16 @@ export default {
             updateSupplier(this.form.id,this.form).then(response => {
               if (response.code === 200) {
                 this.msgSuccess('修改成功')
-                this.open = false
-                this.handleQuery()
+                this.cancel();
               } else {
                 this.msgError(response.msg)
               }
             })
           } else {
             create(this.form).then(response => {
-              console.log(response)
               if (response.code === 200) {
                 this.msgSuccess('新增成功')
-                this.open = false
-                this.handleQuery()
+                this.cancel();
               } else {
                 this.msgError(response.msg)
               }

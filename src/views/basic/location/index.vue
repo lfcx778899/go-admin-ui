@@ -135,6 +135,7 @@
         this.open = false;
         this.ifEdit = false;
         this.form = {};
+        this.handleQuery();
       },
       // 表单重置
       reset() {
@@ -190,9 +191,7 @@
               updateLocation(this.form.id,this.form).then(response => {
                 if (response.code === 200) {
                   this.msgSuccess('修改成功')
-                  this.ifEdit = false;
-                  this.open = false
-                  this.getList()
+                  this.cancel()
                 } else {
                   this.msgError(response.msg)
                 }
@@ -201,8 +200,7 @@
               create(this.form).then(response => {
                 if (response.code === 200) {
                   this.msgSuccess('新增成功')
-                  this.open = false
-                  this.getList()
+                  this.cancel()
                 } else {
                   this.msgError(response.msg)
                 }
