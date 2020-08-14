@@ -113,6 +113,18 @@
       @pagination="getInPage"
     />
 
+    <el-row :gutter="10" class="mb8" style="margin-top: 20px">
+      <el-col :span="1.5">
+        <el-button
+          type="warning"
+          icon="el-icon-s-promotion"
+          size="mini"
+          @click="backToList"
+        >返回列表
+        </el-button>
+      </el-col>
+    </el-row>
+
     <el-dialog title="入库" :visible.sync="open" width="800px" :close-on-click-modal="false">
       <el-form>
         <el-form-item label="库位" width="150" >
@@ -200,6 +212,9 @@
         getPurchaseControlItem({purchase_control_id:this.purchaseControlId}).then(response=>{
           this.purchaseControlOrder = response.data;
         });
+      },
+      backToList(){
+        this.$router.push({path:'/inventory/ininventory'})
       },
       getAllLocation(){
         getAll().then(response=>{

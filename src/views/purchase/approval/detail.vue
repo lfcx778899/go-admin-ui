@@ -111,6 +111,15 @@
             @click="handleSingleReject"
           >取消采购</el-button>
         </el-col>
+        <el-col :span="1.5">
+          <el-button
+            type="warning"
+            icon="el-icon-s-promotion"
+            size="mini"
+            @click="backToList"
+          >返回列表
+          </el-button>
+        </el-col>
       </el-row>
     </div>
   </div>
@@ -159,6 +168,9 @@
             this.getLogPage();
           }
         });
+      },
+      backToList(){
+        this.$router.push({path:'/purchase/approval'})
       },
       getLogPage(){
         getPage(this.queryParams).then(response=>{

@@ -92,9 +92,19 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getLogPage"
     />
+
+    <el-row :gutter="10" class="mb8" style="margin-top: 20px">
+      <el-col :span="1.5">
+        <el-button
+          type="warning"
+          icon="el-icon-s-promotion"
+          size="mini"
+          @click="backToList"
+        >返回列表
+        </el-button>
+      </el-col>
+    </el-row>
   </div>
-
-
 </template>
 
 <script>
@@ -154,7 +164,10 @@
             this.total = response.data.total;
           }
         })
-      }
+      },
+      backToList(){
+        this.$router.push({path:'/purchase/apply'})
+      },
     }
   }
 </script>

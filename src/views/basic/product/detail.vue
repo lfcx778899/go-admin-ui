@@ -92,7 +92,7 @@
       <el-table-column label="价格单位" prop="price_unit" width="250" />
       <el-table-column label="税率" prop="tax_rate" width="100" >
         <template slot-scope="scope">
-          <span>{{scope.row.tax_rate*100}}%</span>
+          <span>{{scope.row.tax_rate}}%</span>
         </template>
       </el-table-column>
       <el-table-column label="是否默认" prop="is_default" width="120" >
@@ -131,6 +131,17 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getSupplierPricePage"
     />
+    <el-row :gutter="10" class="mb8" style="margin-top: 20px">
+      <el-col :span="1.5">
+        <el-button
+          type="warning"
+          icon="el-icon-s-promotion"
+          size="mini"
+          @click="backToList"
+        >返回列表
+        </el-button>
+      </el-col>
+    </el-row>
 
     <el-dialog :title="title" :visible.sync="open" width="500px" :close-on-click-modal="false">
       <el-form ref="form" :model="form" :rules="rules" label-width="120px">
@@ -166,7 +177,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="税率" prop="tax_rate">
-          <el-input-number v-model="form.tax_rate" :min="0.00" :step="0.01" style="width: 300px"/>
+          <el-input-number v-model="form.tax_rate" :min="0" :step="1" style="width: 280px"/> %
         </el-form-item>
         <el-form-item label="默认" prop="is_default">
           <el-radio-group v-model="form.is_default">
@@ -196,6 +207,19 @@
     export default {
         name: "detail",
       data(){
+        const checkRate = (rule, value, callback) => {
+          setTimeout(() => {
+            if (!Number.isInteger(value)) {
+              callback(new Error('请输入数字值'));
+            } else {
+              if (value <= 0) {
+                callback(new Error('税率不能小于或等于0'));
+              } else {
+                callback();
+              }
+            }
+          }, 1000);
+        };
           return {
             productId:'',
             product:{},
@@ -209,7 +233,8 @@
               supplier_id: [{ required: true, message: '供应商名称不能为空', trigger: 'blur' }],
               product_price_withouttax: [{ required: true, message: '价格不能为空', trigger: 'blur' }],
               price_unit: [{ required: true, message: '价格单位不能为空', trigger: 'blur' }],
-              tax_rate: [{ required: true, message: '税率不能为空', trigger: 'blur' }],
+              tax_rate: [{ required: true, message: '税率不能为空', trigger: 'blur' },
+                {validator: checkRate,trigger: 'blur'}],
               is_default: [{ required: true, message: '是否默认不能为空', trigger: 'blur' }],
             },
             form: {},
@@ -244,6 +269,9 @@
         handleAdd(){
           this.reset()
           this.open = true
+        },
+        backToList(){
+          this.$router.push({path:'/basic/product'})
         },
         reset(){
           this.form = {

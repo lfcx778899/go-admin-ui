@@ -80,6 +80,15 @@
                      @click="handleSingleAudit"
           >确认付款</el-button>
         </el-col>
+        <el-col :span="1.5">
+          <el-button
+            type="warning"
+            icon="el-icon-s-promotion"
+            size="mini"
+            @click="backToList"
+          >返回列表
+          </el-button>
+        </el-col>
       </el-row>
     </div>
   </div>
@@ -114,6 +123,9 @@
         getPurchaseControlItem({purchase_control_id:this.purchaseControlId}).then(response=>{
           this.purchaseControlOrder = response.data;
         });
+      },
+      backToList(){
+        this.$router.push({path:'/settlement/payment'})
       },
       getStatusName(statusId){
         if(statusId ===1){
