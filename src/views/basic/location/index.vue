@@ -63,7 +63,7 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" :close-on-click-modal="false">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="库位简称" prop="location_name">
-          <el-input :disabled="ifEdit" v-model="form.location_name" placeholder="请输入库位简称" />
+          <el-input v-model="form.location_name" placeholder="请输入库位简称" />
         </el-form-item>
         <el-form-item label="详细地址" prop="location_adress">
           <el-input v-model="form.location_adress"  placeholder="请输入内容" />
