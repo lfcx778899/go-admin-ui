@@ -66,14 +66,17 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="产品ID" prop="product_id" width="200" />
       <el-table-column label="产品类别" prop="product_type" width="150" />
-      <el-table-column label="产品名称" prop="product_name" width="120" />
-      <el-table-column label="英文名称" prop="product_english_name"/>
+      <el-table-column label="产品名称" prop="product_name" width="150" />
+      <el-table-column label="英文名称" prop="product_english_name" width="150"/>
       <el-table-column label="CASNO号" prop="product_casno" width="120" />
       <el-table-column label="货号" prop="product_item_number" width="120" />
       <el-table-column label="品牌" prop="product_brand_name" width="120" />
       <el-table-column label="规格" prop="product_specifications" width="120" />
       <el-table-column label="单位" prop="product_units" width="120" />
       <el-table-column label="备注" prop="remark" width="120" />
+      <el-table-column label="首选供应商" prop="supplier_name" width="200" />
+      <el-table-column label="价格(不含税)" prop="product_price_withouttax" width="120" />
+      <el-table-column label="币种" prop="price_unit" width="90" />
 
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="280">
         <template slot-scope="scope">
