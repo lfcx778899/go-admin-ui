@@ -134,25 +134,25 @@
     <!-- 添加或修改【请填写功能名称】对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body :close-on-click-modal="false">
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="产品类别">
-          <el-select
-            v-model="form.product_type"
-            placeholder="产品类别"
-            clearable
-            size="small"
-            style="width: 360px"
-            @change="changeAddProductType"
-            :disabled="ifEdit"
-          >
-            <el-option
-              v-for="dict in productTypeList"
-              :key="dict.dictValue"
-              :label="dict.dictLabel"
-              :value="dict.dictLabel"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="产品名称" prop="product_id">
+        <!--<el-form-item label="产品类别">-->
+          <!--<el-select-->
+            <!--v-model="form.product_type"-->
+            <!--placeholder="产品类别"-->
+            <!--clearable-->
+            <!--size="small"-->
+            <!--style="width: 360px"-->
+            <!--@change="changeAddProductType"-->
+            <!--:disabled="ifEdit"-->
+          <!--&gt;-->
+            <!--<el-option-->
+              <!--v-for="dict in productTypeList"-->
+              <!--:key="dict.dictValue"-->
+              <!--:label="dict.dictLabel"-->
+              <!--:value="dict.dictLabel"-->
+            <!--/>-->
+          <!--</el-select>-->
+        <!--</el-form-item>-->
+        <el-form-item label="产品名称">
           <el-select
             v-model="form.product_id"
             placeholder="请选择产品"
@@ -163,7 +163,7 @@
             :disabled="ifEdit"
           >
             <el-option
-              v-for="product in selectProductList"
+              v-for="product in productList"
               :key="product.id"
               :label="product.product_name"
               :value="product.product_id"
@@ -232,10 +232,7 @@
           pageSize: 10
         },
         // 表单参数
-        form: {
-          product_id: '',
-          product_type:'',
-        },
+        form: {},
         // 表单校验
         rules: {
           product_id:[{ required: true, message: '产品名称不能为空', trigger: 'blur' }],
@@ -245,6 +242,7 @@
         productTypeList: [],
         orderStatusList: [],
         selectRows:[],
+        selectAddProductList:[],
         ifEdit:false,
       }
     },
@@ -284,7 +282,7 @@
         this.queryParams.product_name = ''
       },
       changeAddProductType() {
-        this.selectProductList = this.productList.filter(item => {
+        this.selectAddProductList = this.productList.filter(item => {
           return item.product_type === this.form.product_type
         })
         this.form.product_id = ''
@@ -337,18 +335,7 @@
       },
       // 表单重置
       reset() {
-        this.form = {
-          id: undefined,
-          inventoryControlId: undefined,
-          productId: undefined,
-          supplierIds: undefined,
-          requestsQuantity: undefined,
-          remark: undefined,
-          createBy: undefined,
-          updateBy: undefined,
-          createdAt: undefined,
-          updatedAt: undefined
-        }
+        this.form = {}
         this.resetForm('form')
       },
       /** 搜索按钮操作 */
@@ -397,7 +384,7 @@
             if (this.form.id != undefined) {
               let updateData = {
                 product_id: String(this.form.product_id),
-                remark: String(this.form.remark),
+                remark: this.form.remark?String(this.form.remark):'',
                 requests_quantity: this.form.requests_quantity
               }
               updateItem(this.form.id,updateData).then(response=>{
@@ -411,7 +398,7 @@
             } else {
               let createData = {
                 product_id: String(this.form.product_id),
-                remark: String(this.form.remark),
+                remark: this.form.remark?String(this.form.remark):'',
                 requests_quantity: this.form.requests_quantity
               }
               createOut(createData).then(response => {

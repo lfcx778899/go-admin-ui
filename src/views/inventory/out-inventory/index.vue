@@ -176,7 +176,7 @@ export default {
       deptOptions:undefined,
       productTypeList:[],
       orderStatusList:[
-        {dictLabel: "提交", dictValue: "2"},
+        {dictLabel: "待出库", dictValue: "2"},
         {dictLabel: "已出库", dictValue: "3"},
         {dictLabel: "已拒绝", dictValue: "4"}
       ],
@@ -191,9 +191,9 @@ export default {
     getDicts('goods_type').then(response => {
       this.productTypeList = response.data
     })
-    getDicts('receive_status').then(response => {
-      this.orderStatusList = response.data
-    })
+    // getDicts('receive_status').then(response => {
+    //   this.orderStatusList = response.data
+    // })
     getAll().then(response => {
       this.productList = response.data.items
       this.selectProductList = this.productList
@@ -292,13 +292,10 @@ export default {
     },
     /** 搜索按钮操作 */
     handleQuery() {
-      this.queryParams = {
-        pageIndex: 1,
-          pageSize: 10,
-          requests_statuss: '2,3,4',
-      };
       if(this.queryParams.requests_status){
         this.queryParams.requests_statuss = this.queryParams.requests_status
+      }else{
+        this.queryParams.requests_statuss = '2,3,4'
       }
       this.getList();
     },
