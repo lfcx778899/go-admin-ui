@@ -96,7 +96,7 @@
       </el-table-column>
       <el-table-column label="申请人" align="center" prop="create_by_name"/>
       <el-table-column label="备注" align="center" prop="remark"/>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="200">
         <template slot-scope="scope">
           <el-button v-if="scope.row.requests_status===1"
                      size="small"
@@ -273,6 +273,7 @@
       // 取消按钮
       cancel() {
         this.open = false
+        this.ifEdit = false;
         this.form = {}
         this.handleQuery();
       },

@@ -61,3 +61,12 @@ export function getApprovals(query) {
     params: query
   })
 }
+
+// 确认供应商
+export function confirmSupplier(data) {
+  return request({
+    url: '/api/purchase_request/confirm_supplier',
+    method: 'post',
+    data: data
+  })
+}

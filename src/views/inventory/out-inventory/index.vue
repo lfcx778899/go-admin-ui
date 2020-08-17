@@ -1,6 +1,22 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="100px">
+      <el-form-item label="状态" prop="requests_status">
+        <el-select
+          v-model="queryParams.requests_status"
+          placeholder="状态"
+          clearable
+          size="small"
+          style="width: 240px"
+        >
+          <el-option
+            v-for="dict in orderStatusList"
+            :key="dict.dictValue"
+            :label="dict.dictLabel"
+            :value="dict.dictValue"
+          />
+        </el-select>
+      </el-form-item>
       <el-form-item label="归属部门">
         <treeselect
           v-model="queryParams.dept_id"
@@ -159,7 +175,11 @@ export default {
       },
       deptOptions:undefined,
       productTypeList:[],
-      orderStatusList:[],
+      orderStatusList:[
+        {dictLabel: "提交", dictValue: "2"},
+        {dictLabel: "已出库", dictValue: "3"},
+        {dictLabel: "已拒绝", dictValue: "4"}
+      ],
       productList:[],
       selectProductList:[],
       rejectId:'',
@@ -277,6 +297,9 @@ export default {
           pageSize: 10,
           requests_statuss: '2,3,4',
       };
+      if(this.queryParams.requests_status){
+        this.queryParams.requests_statuss = this.queryParams.requests_status
+      }
       this.getList();
     },
     /** 重置按钮操作 */

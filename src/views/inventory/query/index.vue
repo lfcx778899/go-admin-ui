@@ -67,7 +67,7 @@
       <el-table-column label="产品名称" align="center" prop="product_name"/>
       <el-table-column label="库存数量" align="center" prop="inventory_quantity"/>
       <el-table-column label="预警数量" align="center" prop="safety_inventory"/>
-      <el-table-column label="存储位置" align="center" prop="remark"/>
+      <el-table-column label="存储位置" align="center" prop="location_adress"/>
       <!--<el-table-column label="操作" align="center" class-name="small-padding fixed-width">-->
       <!--<template slot-scope="scope">-->
       <!--<el-button-->
