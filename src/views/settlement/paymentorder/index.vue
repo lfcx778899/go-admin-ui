@@ -1,6 +1,22 @@
 <template>
   <div class="app-container">
     <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="100px">
+      <el-form-item label="状态" prop="page_status">
+        <el-select
+          v-model="queryParams.page_status"
+          placeholder="状态"
+          clearable
+          size="small"
+          style="width: 240px"
+        >
+          <el-option
+            v-for="dict in orderStatusList"
+            :key="dict.dictValue"
+            :label="dict.dictLabel"
+            :value="dict.dictValue"
+          />
+        </el-select>
+      </el-form-item>
       <el-form-item label="采购单号">
         <el-input v-model="queryParams.purchase_control_id" style="width: 200px"></el-input>
       </el-form-item>
@@ -127,15 +143,18 @@
         rules: {},
         inUseSupplier:[],
         purchasecontrolList:[],
+        orderStatusList:[
+          {dictLabel: "已入库", dictValue: "3"},{dictLabel: "部分入库", dictValue: "4"},{dictLabel: "待付款", dictValue: "5"},{dictLabel: "已付款", dictValue: "6"}
+        ]
       }
     },
     created() {
       getDicts('goods_type').then(response => {
         this.productTypeList = response.data
       })
-      getDicts('purchase_status').then(response => {
-        this.orderStatusList = response.data
-      })
+      // getDicts('purchase_status').then(response => {
+      //   this.orderStatusList = response.data
+      // })
       getInUseSupplier().then(resp => {
         this.inUseSupplier = resp.data.items
       })
@@ -208,6 +227,11 @@
       /** 搜索按钮操作 */
       handleQuery() {
         this.queryParams.pageIndex = 1
+        if(this.queryParams.page_status){
+          this.queryParams.purchase_status = this.queryParams.page_status;
+        }else{
+          this.queryParams.purchase_status ='3,4,5,6';
+        }
         this.getList()
       },
       /** 重置按钮操作 */

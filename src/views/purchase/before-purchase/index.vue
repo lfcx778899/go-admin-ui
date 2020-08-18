@@ -165,8 +165,8 @@
     />
 
     <el-dialog :title="title" :visible.sync="open" width="500px" :close-on-click-modal="false">
-      <el-form ref="form" :model="form" label-width="80px">
-        <el-form-item label="供应商" prop="supplier_id"  v-if="!showPrice">
+      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="供应商" v-if="!showPrice">
           <el-select
             v-model="form.ids"
             placeholder="请选择供应商"
@@ -184,7 +184,7 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="供应商" prop="supplier_id"  v-if="showPrice">
+        <el-form-item label="供应商" prop="supplier_id" v-if="showPrice">
           <el-select
             v-model="form.supplier_id"
             placeholder="请选择供应商"
@@ -202,7 +202,7 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="单价" prop="product_id"  v-if="showPrice">
+        <el-form-item label="单价" prop="price"  v-if="showPrice">
           <el-input-number :min="0.00" :step="0.01" v-model="form.price" style="width: 360px"/>
         </el-form-item>
         <el-form-item label="价格单位" prop="price_unit" v-if="showPrice">
@@ -282,7 +282,12 @@
           {dictLabel: "询价中", dictValue: "5"},
           {dictLabel: "已确认", dictValue: "6"}
         ],
-        rules: {},
+        rules: {
+          price:[{ required: true, message: '单价不能为空', trigger: 'blur' }],
+          price_unit:[{ required: true, message: '价格单位不能为空', trigger: 'blur' }],
+          tax_rate:[{ required: true, message: '税率不能为空', trigger: 'blur' }],
+          supplier_id:[{ required: true, message: '税率不能为空', trigger: 'blur' }],
+        },
         selectRows: [],
         inUseSupplier: [],
         deptOptions: undefined,
@@ -334,18 +339,22 @@
         this.multiple = !selection.length
       },
       changeSupplier(){
+        let price =0,price_unit='',tax_rate=0;
         this.ProductSuppliers.forEach(supplier=>{
           if(supplier.supplier_id === this.form.supplier_id){
-            this.form.price = supplier.product_price_withouttax;
-            this.form.price_unit = supplier.price_unit;
-            this.form.tax_rate = supplier.tax_rate;
+            price = supplier.product_price_withouttax;
+            price_unit = supplier.price_unit;
+            tax_rate = supplier.tax_rate;
           }
         })
+        this.form.price = price;
+        this.form.price_unit = price_unit;
+        this.form.tax_rate = tax_rate;
       },
       cancel(){
         this.title = "";
         this.open = false;
-        this.form = {};
+        this.form = {ids:[]};
         this.showPrice = false;
         this.purchaseRequestId='';
       },

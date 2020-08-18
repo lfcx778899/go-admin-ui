@@ -89,6 +89,8 @@
       <el-table-column label="产品类别" align="center" prop="product_type"/>
       <el-table-column label="产品名称" align="center" prop="product_name"/>
       <el-table-column label="申请数量" align="center" prop="requests_quantity"/>
+      <el-table-column label="规格" prop="product_specifications" width="150"/>
+      <el-table-column label="单位" prop="product_units"  width="150"/>
       <el-table-column label="采购状态" align="center">
         <template slot-scope="scope">
           <span>{{getStatusName(scope.row.requests_status)}}</span>
@@ -161,6 +163,7 @@
             size="small"
             style="width: 360px"
             :disabled="ifEdit"
+            @change="handleChangeProduct"
           >
             <el-option
               v-for="product in productList"
@@ -175,6 +178,12 @@
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" placeholder="请填写备注" style="width: 360px"/>
+        </el-form-item>
+        <el-form-item label="规格" prop="product_specifications">
+          <el-input v-model="form.product_specifications" disabled style="width: 360px"/>
+        </el-form-item>
+        <el-form-item label="单位" prop="product_units"  >
+          <el-input v-model="form.product_units" disabled style="width: 360px"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -267,6 +276,16 @@
           this.total = response.data.total
           this.loading = false
         })
+      },
+      handleChangeProduct(){
+        if(this.productList.length>0){
+          this.productList.forEach(item=>{
+            if(item.product_id===this.form.product_id){
+              this.form.product_specifications = item.product_specifications;
+              this.form.product_units = item.product_units;
+            }
+          })
+        }
       },
       // 取消按钮
       cancel() {

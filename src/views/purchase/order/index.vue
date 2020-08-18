@@ -1,6 +1,22 @@
 <template>
   <div class="app-container">
     <el-form ref="queryForm" :model="queryParams" :inline="true" label-width="100px">
+      <el-form-item label="状态" prop="page_status">
+        <el-select
+          v-model="queryParams.page_status"
+          placeholder="状态"
+          clearable
+          size="small"
+          style="width: 240px"
+        >
+          <el-option
+            v-for="dict in orderStatusList"
+            :key="dict.dictValue"
+            :label="dict.dictLabel"
+            :value="dict.dictValue"
+          />
+        </el-select>
+      </el-form-item>
       <el-form-item label="供应商">
         <el-select
           v-model="queryParams.supplier_id"
@@ -63,9 +79,15 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
+          <el-button v-if="scope.row.purchase_status===1"
+                     type="primary"
+                     icon="el-icon-check"
+                     size="small"
+                     @click="handleSingleAudit(scope.row)"
+          >确认采购</el-button>
           <el-button
             size="small"
-            type="primary"
+            type="success"
             icon="el-icon-edit"
             @click="handleDetail(scope.row)"
           >详情</el-button>
@@ -80,13 +102,36 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
+
+    <el-dialog title="上传合同" :visible.sync="open" width="500px" :close-on-click-modal="false">
+      <el-form ref="form" label-width="100px">
+        <el-form-item label="上传合同" prop="remark">
+          <el-upload
+            :limit=1
+            :auto-upload="false"
+            :action="UploadUrl()"
+            :before-upload="beforeUploadFile"
+            :on-change="fileChange"
+            :on-exceed="exceedFile"
+            :on-success="handleSuccess"
+            :on-error="handleError"
+            :file-list="fileList">
+            <el-button size="small" type="primary">点击上传</el-button>
+          </el-upload>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="uploadFile">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { getDicts } from '@/api/system/dict/data'
 import { getInUseSupplier } from '@/api/basic/supplier'
-import { getPurchaseControlPage } from '@/api/purchase/purchaseControl'
+import { getPurchaseControlPage,updateStatus ,uploadContract} from '@/api/purchase/purchaseControl'
 
 export default {
   name: 'Index',
@@ -122,15 +167,20 @@ export default {
       rules: {},
       inUseSupplier:[],
       purchasecontrolList:[],
+      orderStatusList:[
+        {dictLabel: "新建", dictValue: "1"},{dictLabel: "确认采购", dictValue: "2"}
+      ],
+      fileList:[],
+
     }
   },
   created() {
     getDicts('goods_type').then(response => {
       this.productTypeList = response.data
     })
-    getDicts('purchase_status').then(response => {
-      this.orderStatusList = response.data
-    })
+    // getDicts('purchase_status').then(response => {
+    //   this.orderStatusList = response.data
+    // })
     getInUseSupplier().then(resp => {
       this.inUseSupplier = resp.data.items
     })
@@ -173,11 +223,6 @@ export default {
       sessionStorage.setItem('purchaseControlId', row.purchase_control_id)
       this.$router.push({ path: '/purchase/order/detail' })
     },
-    // 取消按钮
-    cancel() {
-      this.open = false
-      this.reset()
-    },
     // 表单重置
     reset() {
       this.form = {
@@ -203,6 +248,11 @@ export default {
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageIndex = 1
+      if(this.queryParams.page_status){
+        this.queryParams.purchase_status = this.queryParams.page_status;
+      }else{
+        this.queryParams.purchase_status ='1,2';
+      }
       this.getList()
     },
     /** 重置按钮操作 */
@@ -261,19 +311,73 @@ export default {
         }
       })
     },
-    /** 删除按钮操作 */
-    handleDelete(row) {
-      const Ids = row.id || this.ids
-      this.$confirm('是否确认删除编号为"' + Ids + '"的数据项?', '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(function() {
-        return delPurchaseControl(Ids)
-      }).then(() => {
-        this.getList()
-        this.msgSuccess('删除成功')
-      }).catch(function() {})
+    handleSingleAudit(row){
+      this.purchase_control_id = row.purchase_control_id;
+      this.open = true;
+    },
+    UploadUrl(){
+      return "";
+    },
+    cancel(){
+      this.purchase_control_id = '';
+      this.open = false;
+      this.fileList =[];
+      this.getList();
+    },
+    exceedFile(files, fileList) {
+      this.msgError("选择多个文件");
+    },
+    fileChange(file, fileList) {
+      this.fileList.push(file.raw) ;
+    },
+    beforeUploadFile(file) {
+      let extension = file.name.substring(file.name.lastIndexOf('.')+1);
+      let size = file.size / 1024 / 1024;
+      if(extension !== 'xlsx') {
+        this.msgError("只能上传后缀是.xlsx的文件");
+      }
+      if(size > 4) {
+        this.msgError("文件大小不得超过4M");
+      }
+    },
+    // 文件上传成功时的钩子
+    handleSuccess(res, file, fileList) {
+      this.msgSuccess('文件上传成功')
+    },
+    // 文件上传失败时的钩子
+    handleError(err, file, fileList) {
+      this.msgError("文件上传失败");
+    },
+    uploadFile() {
+      if(this.fileList.length===1){
+        let form = new FormData();
+        form.append('file', this.fileList[0]);
+        uploadContract(this.purchase_control_id,form).then(resp=>{
+          console.log(resp);
+          if (resp.code === 200){
+            let statusData = {purchase_status:2};
+            updateStatus(this.purchase_control_id,statusData).then(res=>{
+              if (res.code === 200){
+                this.cancel();
+              }else{
+                this.msgError(res.msg)
+              }
+            })
+          }else{
+            this.msgError(resp.msg)
+          }
+        })
+      }
+      if(this.fileList.length===0){
+        let statusData = {purchase_status:2};
+        updateStatus(this.purchase_control_id,statusData).then(res=>{
+          if (res.code === 200){
+            this.cancel();
+          }else{
+            this.msgError(res.msg)
+          }
+        })
+      }
     }
   }
 }

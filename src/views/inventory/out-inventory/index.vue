@@ -1,69 +1,90 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="100px">
-      <el-form-item label="状态" prop="requests_status">
-        <el-select
-          v-model="queryParams.requests_status"
-          placeholder="状态"
-          clearable
-          size="small"
-          style="width: 240px"
-        >
-          <el-option
-            v-for="dict in orderStatusList"
-            :key="dict.dictValue"
-            :label="dict.dictLabel"
-            :value="dict.dictValue"
+      <el-row>
+        <el-form-item label="状态" prop="requests_status">
+          <el-select
+            v-model="queryParams.requests_status"
+            placeholder="状态"
+            clearable
+            size="small"
+            style="width: 240px"
+          >
+            <el-option
+              v-for="dict in orderStatusList"
+              :key="dict.dictValue"
+              :label="dict.dictLabel"
+              :value="dict.dictValue"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="归属部门">
+          <treeselect
+            v-model="queryParams.dept_id"
+            :options="deptOptions"
+            :normalizer="normalizer"
+            placeholder="请选择归属部门"
+            style="width: 240px"
           />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="归属部门">
-        <treeselect
-          v-model="queryParams.dept_id"
-          :options="deptOptions"
-          :normalizer="normalizer"
-          placeholder="请选择归属部门"
-          style="width: 240px"
-        />
-      </el-form-item>
-      <el-form-item label="产品类别">
-        <el-select
-          v-model="queryParams.product_type"
-          placeholder="产品类别"
-          clearable
-          size="small"
-          style="width: 240px"
-          @change="changeProductName"
-        >
-          <el-option
-            v-for="dict in productTypeList"
-            :key="dict.dictValue"
-            :label="dict.dictLabel"
-            :value="dict.dictLabel"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="产品名称">
-        <el-select
-          v-model="queryParams.product_name"
-          placeholder="产品名称"
-          clearable
-          filterable
-          size="small"
-          style="width: 240px"
-        >
-          <el-option
-            v-for="product in selectProductList"
-            :key="product.id"
-            :label="product.product_name"
-            :value="product.product_name"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-      </el-form-item>
+        </el-form-item>
+        <el-form-item label="产品类别">
+          <el-select
+            v-model="queryParams.product_type"
+            placeholder="产品类别"
+            clearable
+            size="small"
+            style="width: 240px"
+            @change="changeProductName"
+          >
+            <el-option
+              v-for="dict in productTypeList"
+              :key="dict.dictValue"
+              :label="dict.dictLabel"
+              :value="dict.dictLabel"
+            />
+          </el-select>
+        </el-form-item>
+      </el-row>
+      <el-row>
+        <el-form-item label="产品名称">
+          <el-select
+            v-model="queryParams.product_name"
+            placeholder="产品名称"
+            clearable
+            filterable
+            size="small"
+            style="width: 240px"
+          >
+            <el-option
+              v-for="product in selectProductList"
+              :key="product.id"
+              :label="product.product_name"
+              :value="product.product_name"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="库位名称">
+          <el-select
+            v-model="queryParams.product_name"
+            placeholder="库位名称"
+            clearable
+            filterable
+            size="small"
+            style="width: 240px"
+          >
+            <el-option
+              v-for="product in locationList"
+              :key="product.id"
+              :label="product.location_name"
+              :value="product.location_name"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+          <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        </el-form-item>
+      </el-row>
     </el-form>
 
     <el-table v-loading="loading" :data="requestsList" @selection-change="handleSelectionChange">
@@ -83,6 +104,9 @@
       </el-table-column>
       <el-table-column label="产品类别" align="center" prop="product_type" width="100"/>
       <el-table-column label="产品名称" align="center" prop="product_name" width="100"/>
+      <el-table-column label="规格" prop="product_specifications" width="120" />
+      <el-table-column label="单位" prop="product_units" width="120" />
+      <el-table-column label="库位" prop="location_name" width="120" />
       <el-table-column label="出库数量" align="center" prop="requests_quantity" width="100"/>
       <el-table-column label="操作人" align="center" prop="update_By" width="100"/>
       <el-table-column label="操作日期" align="center" width="180">
@@ -90,8 +114,8 @@
           <span>{{parseTime(scope.row.updated_at)}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="备注" align="center" prop="remark" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="备注" align="center" prop="remark" width="100"/>
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="300">
         <template slot-scope="scope">
           <el-button v-if="scope.row.requests_status===2"
             size="small"

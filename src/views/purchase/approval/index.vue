@@ -84,12 +84,12 @@
           <span>{{scope.row.statusName}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="产品类别" prop="product_type"/>
-      <el-table-column label="产品名称" prop="product_name"/>
-      <el-table-column label="申请数量" prop="requests_quantity"/>
+      <el-table-column label="产品类别" prop="product_type" width="150"/>
+      <el-table-column label="产品名称" prop="product_name" width="150"/>
+      <el-table-column label="申请数量" prop="requests_quantity" width="80"/>
       <el-table-column label="规格" prop="product_specifications" width="150"/>
       <el-table-column label="单位" prop="product_units"  width="150"/>
-      <el-table-column label="备注" prop="remark"/>
+      <el-table-column label="备注" prop="remark" width="150"/>
       <el-table-column label="操作" align="left" class-name="small-padding fixed-width" width="360">
         <template slot-scope="scope">
           <el-button v-if="scope.row.requests_status===2"

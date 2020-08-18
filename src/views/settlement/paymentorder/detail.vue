@@ -55,12 +55,14 @@
     </div>
     <el-table v-loading="loading" :data="logList">
       <el-table-column label="类型名称" prop="product_type" width="150" />
-      <el-table-column label="商品名称" prop="product_name" width="150" />
+      <el-table-column label="商品名称" prop="product_name"/>
       <el-table-column label="采购数量" prop="pruchase_quantity" width="150" />
+      <el-table-column label="规格" prop="product_specifications" width="120" />
+      <el-table-column label="单位" prop="product_units" width="120" />
       <el-table-column label="单价" prop="unitprice_without_tax" width="250" />
-      <el-table-column label="总金额" prop="amount_without_tax"/>
+      <el-table-column label="总金额" prop="amount_without_tax"  width="150"/>
       <el-table-column label="已入库数量" prop="storaged_quantity" width="150" />
-      <el-table-column label="已入库金额" prop="storaged_amount_without_tax"/>
+      <el-table-column label="已入库金额" prop="storaged_amount_without_tax" width="150" />
     </el-table>
     <pagination
       v-show="total>0"

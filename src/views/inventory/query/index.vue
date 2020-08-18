@@ -34,6 +34,23 @@
           />
         </el-select>
       </el-form-item>
+      <el-form-item label="库位名称">
+        <el-select
+          v-model="queryParams.product_name"
+          placeholder="库位名称"
+          clearable
+          filterable
+          size="small"
+          style="width: 240px"
+        >
+          <el-option
+            v-for="product in locationList"
+            :key="product.id"
+            :label="product.location_name"
+            :value="product.location_name"
+          />
+        </el-select>
+      </el-form-item>
       <!--<el-form-item label="产品名称">-->
         <!--<el-input-->
           <!--v-model="queryParams.product_name"-->
@@ -63,11 +80,13 @@
 
     <el-table v-loading="loading" :data="controlList">
       <el-table-column type="selection" width="55" align="center"/>
-      <el-table-column label="产品类别" align="center" prop="product_type"/>
+      <el-table-column label="产品类别" align="center" prop="product_type" />
       <el-table-column label="产品名称" align="center" prop="product_name"/>
-      <el-table-column label="库存数量" align="center" prop="inventory_quantity"/>
-      <el-table-column label="预警数量" align="center" prop="safety_inventory"/>
-      <el-table-column label="存储位置" align="center" prop="location_adress"/>
+      <el-table-column label="规格" prop="product_specifications"/>
+      <el-table-column label="单位" prop="product_units" width="120" />
+      <el-table-column label="库存数量" align="center" prop="inventory_quantity" width="120"/>
+      <el-table-column label="预警数量" align="center" prop="safety_inventory" width="120"/>
+      <el-table-column label="存储位置" align="center" prop="location_name" width="120"/>
       <!--<el-table-column label="操作" align="center" class-name="small-padding fixed-width">-->
       <!--<template slot-scope="scope">-->
       <!--<el-button-->
@@ -122,6 +141,7 @@
   import { getControlPage } from '@/api/inventory/control'
   import { getDicts } from '@/api/system/dict/data'
   import { getAll } from '@/api/basic/product'
+  import { getAll as getAllLocation } from '@/api/basic/location'
   export default {
     name: 'Index',
     data() {
@@ -154,6 +174,7 @@
         productTypeList:[],
         productList:[],
         selectProductList:[],
+        locationList:[],
       }
     },
     created() {
@@ -163,6 +184,9 @@
       getAll().then(response => {
         this.productList = response.data.items
         this.selectProductList = this.productList
+      })
+      getAllLocation().then(resp=>{
+        this.locationList = resp.data.items
       })
       this.getList()
     },
