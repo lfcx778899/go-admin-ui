@@ -228,6 +228,10 @@ export default {
     getDicts('goods_type').then(response => {
       this.productTypeList = response.data
     })
+    let productQuery = JSON.parse(sessionStorage.getItem('productQuery'));
+    if(productQuery){
+      this.queryParams = {...productQuery};
+    }
     this.getList()
   },
   methods: {
@@ -366,6 +370,7 @@ export default {
     },
     handleDetail(row){
       sessionStorage.setItem("productId",row.id);
+      sessionStorage.setItem('productQuery',JSON.stringify(this.queryParams));
       this.$router.push({path:'/basic/productdetail'})
     },
     /** 提交按钮 */

@@ -158,6 +158,10 @@
       getInUseSupplier().then(resp => {
         this.inUseSupplier = resp.data.items
       })
+      let inQuery = JSON.parse(sessionStorage.getItem('inQuery'));
+      if(inQuery){
+        this.queryParams = {...inQuery};
+      }
       this.getList()
 
     },
@@ -194,7 +198,8 @@
         return ""
       },
       handleDetail(row){
-        sessionStorage.setItem('purchaseControlId', row.purchase_control_id)
+        sessionStorage.setItem('purchaseControlId', row.purchase_control_id);
+        sessionStorage.setItem('inQuery', JSON.stringify(this.queryParams));
         this.$router.push({ path: '/inventory/ininventory/detail' })
       },
       // 取消按钮

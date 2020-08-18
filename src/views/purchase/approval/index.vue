@@ -187,6 +187,11 @@ export default {
     // getDicts('purchase_status').then(response => {
     //   this.orderStatusList = response.data
     // })
+    let approvalQuery = JSON.parse(sessionStorage.getItem('approvalQuery'));
+    console.log(approvalQuery);
+    if(approvalQuery){
+      this.queryParams = {...approvalQuery};
+    }
     this.getList();
   },
   methods:{
@@ -347,6 +352,7 @@ export default {
     },
     handleDetail(row){
       sessionStorage.setItem("purchaseRequestId",row.id);
+      sessionStorage.setItem("approvalQuery",JSON.stringify(this.queryParams));
       this.$router.push({path:'/purchase/approval/detail'})
     },
   }

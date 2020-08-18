@@ -318,6 +318,10 @@
       getDicts('money_type').then(response => {
         this.moneyTypeList = response.data
       })
+      let beforeQuery = JSON.parse(sessionStorage.getItem('beforeQuery'));
+      if(beforeQuery){
+        this.queryParams = {...beforeQuery};
+      }
       this.getList()
     },
     methods: {
@@ -593,6 +597,7 @@
       },
       handleDetail(row) {
         sessionStorage.setItem('purchaseRequestId', row.id)
+        sessionStorage.setItem('beforeQuery', JSON.stringify(this.queryParams));
         this.$router.push({ path: '/purchase/before-pur/detail' })
       },
       handleAllCreate() {

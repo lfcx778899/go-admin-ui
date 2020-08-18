@@ -200,7 +200,7 @@
             if (response.code === 200) {
               this.msgSuccess('操作成功')
               this.open = false
-              this.getList()
+              this.getOrderInfo()
             } else {
               this.msgError(response.msg)
             }
@@ -218,7 +218,7 @@
             if (response.code === 200) {
               this.msgSuccess('操作成功')
               this.open = false
-              this.getList()
+              this.getOrderInfo()
             } else {
               this.msgError(response.msg)
             }

@@ -256,6 +256,10 @@ export default {
       this.productList = response.data.items;
       this.selectProductList = this.productList;
     })
+    let applyQuery = JSON.parse(sessionStorage.getItem('applyQuery'));
+    if(applyQuery){
+      this.queryParams = {...applyQuery};
+    }
     this.getList()
   },
   methods: {
@@ -405,6 +409,7 @@ export default {
     },
     handleDetail(row){
       sessionStorage.setItem("purchaseRequestId",row.id);
+      sessionStorage.setItem('applyQuery', JSON.stringify(this.queryParams));
       this.$router.push({path:'/purchase/apply/detail'})
     },
     /** 提交按钮 */

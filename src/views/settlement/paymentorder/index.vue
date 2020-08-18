@@ -158,6 +158,10 @@
       getInUseSupplier().then(resp => {
         this.inUseSupplier = resp.data.items
       })
+      let paymentQuery = JSON.parse(sessionStorage.getItem('paymentQuery'));
+      if(paymentQuery){
+        this.queryParams = paymentQuery;
+      }
       this.getList()
 
     },
@@ -194,7 +198,8 @@
         return ""
       },
       handleDetail(row){
-        sessionStorage.setItem('purchaseControlId', row.purchase_control_id)
+        sessionStorage.setItem('purchaseControlId', row.purchase_control_id);
+        sessionStorage.setItem('paymentQuery', JSON.stringify(this.queryParams));
         this.$router.push({ path: '/settlement/payment/detail' })
       },
       // 取消按钮

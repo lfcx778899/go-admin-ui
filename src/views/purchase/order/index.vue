@@ -184,6 +184,10 @@ export default {
     getInUseSupplier().then(resp => {
       this.inUseSupplier = resp.data.items
     })
+    let orderQuery = JSON.parse(sessionStorage.getItem('orderQuery'));
+    if(orderQuery){
+      this.queryParams = {...orderQuery};
+    }
     this.getList()
 
   },
@@ -221,6 +225,7 @@ export default {
     },
     handleDetail(row){
       sessionStorage.setItem('purchaseControlId', row.purchase_control_id)
+      sessionStorage.setItem('orderQuery', JSON.stringify(this.queryParams))
       this.$router.push({ path: '/purchase/order/detail' })
     },
     // 表单重置
