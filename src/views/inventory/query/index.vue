@@ -36,7 +36,7 @@
       </el-form-item>
       <el-form-item label="库位名称">
         <el-select
-          v-model="queryParams.product_name"
+          v-model="queryParams.warehouse_id"
           placeholder="库位名称"
           clearable
           filterable
@@ -44,10 +44,10 @@
           style="width: 240px"
         >
           <el-option
-            v-for="product in locationList"
-            :key="product.id"
-            :label="product.location_name"
-            :value="product.location_name"
+            v-for="location in locationList"
+            :key="location.id"
+            :label="location.location_name"
+            :value="location.id"
           />
         </el-select>
       </el-form-item>
@@ -164,6 +164,7 @@
         open: false,
         // 查询参数
         queryParams: {
+          warehouse_id:'',
           pageIndex: 1,
           pageSize: 10
         },
@@ -231,7 +232,7 @@
       resetQuery() {
         this.queryParams = {
           pageIndex: 1,
-            pageSize: 10
+          pageSize: 10
         }
         this.handleQuery()
       },
